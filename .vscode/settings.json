@@ -1,0 +1,34 @@
+{
+  // --- Terminal / environment ---
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.profiles.osx": {
+    "zsh": {
+      "path": "/bin/zsh",
+      "args": ["-l"]
+    }
+  },
+  // --- Package managers ---
+  "npm.packageManager": "pnpm", 
+  // --- ESLint ---
+  "eslint.validate": ["typescript", "javascript"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "eslint.options": {
+    "resolvePluginsRelativeTo": "${workspaceFolder}"
+  },
+  // Auto fix on save
+  "editor.codeActionsOnSave": [
+    "source.fixAll",
+    "source.fixAll.eslint"
+  ],
+  // --- Prettier ---
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": false, // ESLint handles fixes
+  // --- TypeScript / Nest ---
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  // --- Search / explorer cleanup ---
+  "search.exclude": {
+    "node_modules": true,
+    "dist": true
+  }
+}

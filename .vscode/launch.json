@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Nest: Start (Debug)",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "start:debug"],
+      "console": "integratedTerminal",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Nest: Attach to Running Process (Pick)",
+      "processId": "${command:PickProcess}",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Nest: Attach to Port 9229",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
