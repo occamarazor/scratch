@@ -2,59 +2,96 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start Nest Dev",
+      "label": "Install deps",
       "type": "shell",
-      "command": "pnpm start:dev",
-      "group": "build",
+      "command": "pnpm",
+      "args": ["install"],
+      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
         "panel": "shared"
-      },
-      "problemMatcher": []
+      }
     },
     {
-      "label": "Start Nest Debug",
+      "label": "Build",
       "type": "shell",
-      "command": "pnpm start:debug",
+      "command": "pnpm",
+      "args": ["run", "build"],
       "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Start Nest Prod",
-      "type": "shell",
-      "command": "pnpm start:prod",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Run ESLint",
-      "type": "shell",
-      "command": "pnpm lint",
-      "group": "build",
+      "problemMatcher": ["$tsc"],
       "presentation": {
         "reveal": "silent",
         "panel": "shared"
-      },
-      "problemMatcher": ["$eslint-stylish"]
+      }
     },
     {
-      "label": "Run Tests",
+      "label": "Start Dev",
       "type": "shell",
-      "command": "pnpm test",
-      "group": "test",
+      "command": "pnpm",
+      "args": ["run", "start:dev"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Debug",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "start:debug"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Start Prod",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "start:prod"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Format",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "format"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Lint",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "lint"],
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "test"],
+      "problemMatcher": ["$jest-stare"], 
       "presentation": {
         "reveal": "always",
         "panel": "shared"
-      },
-      "problemMatcher": ["$jest-stare"]
+      }
     }
   ]
 }
