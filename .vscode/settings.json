@@ -8,21 +8,10 @@
     }
   },
   // --- Package managers ---
-  "npm.packageManager": "pnpm", 
+  "npm.packageManager": "pnpm",
   // --- ESLint ---
   "eslint.validate": ["typescript", "javascript"],
   "eslint.workingDirectories": [{ "mode": "auto" }],
-  "eslint.options": {
-    "resolvePluginsRelativeTo": "${workspaceFolder}"
-  },
-  // Auto fix on save
-  "editor.codeActionsOnSave": [
-    "source.fixAll",
-    "source.fixAll.eslint"
-  ],
-  // --- Prettier ---
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": false, // ESLint handles fixes
   // --- TypeScript / Nest ---
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
@@ -30,5 +19,24 @@
   "search.exclude": {
     "node_modules": true,
     "dist": true
-  }
+  },
+  // Auto fix on save
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "files.autoSave": "onWindowChange",
+  // --- Prettier ---
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
+
+  // --- Run on Save (emeraldwalk) ---
+  // "emeraldwalk.runonsave": {
+  //   "commands": [
+  //     {
+  //       "match": ".*\\.(ts|js)$",
+  //       "isAsync": true,
+  //       "cmd": "sleep 0.5 && pnpm lint --fix ${file}"
+  //     }
+  //   ]
+  // }
 }
