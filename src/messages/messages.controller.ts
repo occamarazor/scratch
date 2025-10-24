@@ -1,5 +1,5 @@
-import type { ISystemResponse, TNullable } from '@common/types';
-import type { IUserMessage } from '@messages/messages.types';
+import type { Nullable, Response } from '@common/types';
+import type { Message } from '@messages/messages.types';
 import {
   Body,
   Controller,
@@ -21,12 +21,12 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Get()
-  getMessages(): ISystemResponse<Array<IUserMessage>> {
+  getMessages(): Response<Array<Message>> {
     return this.messagesService.getMessages();
   }
 
   @Post()
-  createMessage(@Body() createMessageDto: CreateMessageDto): ISystemResponse<IUserMessage> {
+  createMessage(@Body() createMessageDto: CreateMessageDto): Response<Message> {
     return this.messagesService.createMessage(createMessageDto);
   }
 
@@ -37,7 +37,7 @@ export class MessagesController {
   }
 
   @Get(':id')
-  getMessageById(@Param('id') id: string): ISystemResponse<TNullable<IUserMessage>> {
+  getMessageById(@Param('id') id: string): Response<Nullable<Message>> {
     return this.messagesService.getMessageById(+id);
   }
 
@@ -45,13 +45,13 @@ export class MessagesController {
   updateMessageById(
     @Param('id') id: string,
     @Body() updateMessageDto: UpdateMessageDto,
-  ): ISystemResponse<TNullable<IUserMessage>> {
+  ): Response<Nullable<Message>> {
     return this.messagesService.updateMessageById(+id, updateMessageDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteMessageById(@Param('id') id: string): ISystemResponse<TNullable<IUserMessage>> {
+  deleteMessageById(@Param('id') id: string): Response<Nullable<Message>> {
     return this.messagesService.deleteMessageById(+id);
   }
 }

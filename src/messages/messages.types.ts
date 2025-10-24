@@ -1,4 +1,4 @@
-export interface IUserMessage {
+export interface Message {
   id: number;
   content: string;
 }
