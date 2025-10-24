@@ -1,3 +1,5 @@
+import type { ISystemResponse, TNullable } from '@common/types';
+import type { IUserMessage } from '@messages/messages.types';
 import {
   Body,
   Controller,
@@ -11,8 +13,8 @@ import {
 } from '@nestjs/common';
 
 import CreateMessageDto from './dto/create-message.dto';
-import UpdateMessageDto from './dto/update-message.dto copy';
-import { ISystemResponse, IUserMessage, MessagesService, TNullable } from './messages.service';
+import UpdateMessageDto from './dto/update-message.dto';
+import { MessagesService } from './messages.service';
 
 @Controller('/api/messages')
 export class MessagesController {

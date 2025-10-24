@@ -1,29 +1,10 @@
+import type { ISystemResponse, TNullable } from '@common/index';
+import { ENotificationType } from '@common/index';
+import { IUserMessage } from '@messages/messages.types';
 import { Injectable } from '@nestjs/common';
 
 import CreateMessageDto from './dto/create-message.dto';
-import UpdateMessageDto from './dto/update-message.dto copy';
-
-// TODO: move types to separate file
-export type TNullable<T> = T | undefined;
-
-export interface IUserMessage {
-  id: number;
-  content: string;
-}
-
-enum ENotificationType {
-  INFO = 'INFO',
-  SUCCESS = 'SUCCESS',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-}
-
-export interface ISystemResponse<T> {
-  timestamp: Date;
-  type: ENotificationType;
-  message: string;
-  data: T;
-}
+import UpdateMessageDto from './dto/update-message.dto';
 
 @Injectable()
 export class MessagesService {

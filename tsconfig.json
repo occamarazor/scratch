@@ -20,6 +20,11 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "baseUrl": "src",
+    "paths": {
+      "@common/*": ["common/*"],
+      "@messages/*": ["messages/*"]
+    }
   }
 }
