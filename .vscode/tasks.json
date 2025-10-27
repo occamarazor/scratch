@@ -37,7 +37,7 @@
       }
     },
     {
-      "label": "Debug",
+      "label": "Start Debug",
       "type": "shell",
       "command": "pnpm",
       "args": ["run", "start:debug"],
@@ -87,7 +87,7 @@
       "type": "shell",
       "command": "pnpm",
       "args": ["run", "test"],
-      "problemMatcher": ["$jest-stare"], 
+      "problemMatcher": ["$jest-stare"],
       "presentation": {
         "reveal": "always",
         "panel": "shared"

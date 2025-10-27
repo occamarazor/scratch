@@ -1,5 +1,5 @@
 import type { Nullable, Response } from '@common/types';
-import type { Message } from '@messages/messages.types';
+import { Notification } from '@common/types';
 import {
   Body,
   Controller,
@@ -7,6 +7,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -15,6 +16,7 @@ import {
 import CreateMessageDto from './dto/create-message.dto';
 import UpdateMessageDto from './dto/update-message.dto';
 import { MessagesService } from './messages.service';
+import type { Message } from './messages.types';
 
 @Controller('/api/messages')
 export class MessagesController {
@@ -22,23 +24,49 @@ export class MessagesController {
 
   @Get()
   getMessages(): Response<Array<Message>> {
-    return this.messagesService.getMessages();
+    const allMessages: Array<Message> = this.messagesService.getMessages();
+    return {
+      timestamp: new Date(),
+      type: Notification.SUCCESS,
+      message: 'Messages retrieved successfully',
+      data: allMessages,
+    };
   }
 
   @Post()
+  @HttpCode(HttpStatus.CREATED) // 201 Created on success
   createMessage(@Body() createMessageDto: CreateMessageDto): Response<Message> {
-    return this.messagesService.createMessage(createMessageDto);
+    const newMessage: Message = this.messagesService.createMessage(createMessageDto);
+    return {
+      timestamp: new Date(),
+      type: Notification.SUCCESS,
+      message: 'Message created successfully',
+      data: newMessage,
+    };
   }
 
   @Delete()
-  @HttpCode(HttpStatus.NO_CONTENT) // Sets a 204 status code for successful deletion
-  removeAll() {
-    return this.messagesService.deleteMessages();
+  @HttpCode(HttpStatus.NO_CONTENT) // 204 No Content
+  removeAll(): void {
+    this.messagesService.deleteMessages();
+    return;
   }
 
   @Get(':id')
   getMessageById(@Param('id') id: string): Response<Nullable<Message>> {
-    return this.messagesService.getMessageById(+id);
+    const messageId: number = +id;
+    const foundMessage: Nullable<Message> = this.messagesService.getMessageById(messageId);
+
+    if (foundMessage) {
+      return {
+        timestamp: new Date(),
+        type: Notification.SUCCESS,
+        message: `Message with ID ${messageId} retrieved successfully`,
+        data: foundMessage,
+      };
+    } else {
+      throw new NotFoundException(`Message with ID ${messageId} not found`);
+    }
   }
 
   @Patch(':id')
@@ -46,12 +74,32 @@ export class MessagesController {
     @Param('id') id: string,
     @Body() updateMessageDto: UpdateMessageDto,
   ): Response<Nullable<Message>> {
-    return this.messagesService.updateMessageById(+id, updateMessageDto);
+    const messageId: number = +id;
+    const updatedMessage = this.messagesService.updateMessageById(messageId, updateMessageDto);
+
+    if (updatedMessage) {
+      return {
+        timestamp: new Date(),
+        type: Notification.SUCCESS,
+        message: `Message with ID ${messageId} updated successfully`,
+        data: updatedMessage,
+      };
+    } else {
+      throw new NotFoundException(`Message with ID ${messageId} not found`);
+    }
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteMessageById(@Param('id') id: string): Response<Nullable<Message>> {
-    return this.messagesService.deleteMessageById(+id);
+  deleteMessageById(@Param('id') id: string): void {
+    const messageId: number = +id;
+    const removedMessage = this.messagesService.deleteMessageById(messageId);
+
+    if (!removedMessage) {
+      // 204 No Content
+      return;
+    } else {
+      throw new NotFoundException(`Message with ID ${messageId} not found`);
+    }
   }
 }

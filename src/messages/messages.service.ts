@@ -1,6 +1,5 @@
-import type { Nullable, Response } from '@common/types';
-import { Notification } from '@common/types';
-import { Message } from '@messages/messages.types';
+import type { Nullable } from '@common/types';
+import type { Message } from '@messages/messages.types';
 import { Injectable } from '@nestjs/common';
 
 import CreateMessageDto from './dto/create-message.dto';
@@ -16,115 +15,50 @@ export class MessagesService {
   ];
   private nextId = 4;
 
-  getMessages(): Response<Array<Message>> {
-    // return a shallow copy so callers can't mutate internal array directly
-    return {
-      timestamp: new Date(),
-      type: Notification.SUCCESS,
-      message: 'Messages retrieved successfully',
-      data: [...this.messages],
-    };
+  getMessages(): Array<Message> {
+    return this.messages;
   }
 
-  createMessage(createMessageDto: CreateMessageDto): Response<Message> {
+  createMessage(createMessageDto: CreateMessageDto): Message {
     const newMessage: Message = {
       id: this.nextId++,
       content: createMessageDto.content,
     };
 
     this.messages = [...this.messages, newMessage];
-
-    return {
-      timestamp: new Date(),
-      type: Notification.SUCCESS,
-      message: 'Message created successfully',
-      data: newMessage,
-    };
+    return newMessage;
   }
 
-  deleteMessages(): Response<Array<Message>> {
+  deleteMessages(): void {
     this.messages = [];
-
-    return {
-      timestamp: new Date(),
-      type: Notification.SUCCESS,
-      message: 'All messages deleted successfully',
-      data: [...this.messages],
-    };
   }
 
-  getMessageById(messageId: number): Response<Nullable<Message>> {
-    const found = this.messages.find((m) => m.id === messageId);
-
-    if (found) {
-      return {
-        timestamp: new Date(),
-        type: Notification.SUCCESS,
-        message: `Message with ID ${messageId} retrieved successfully`,
-        data: { ...found }, // return copy
-      };
-    }
-
-    return {
-      timestamp: new Date(),
-      type: Notification.ERROR,
-      message: `Message with ID ${messageId} not found`,
-      data: undefined,
-    };
+  getMessageById(messageId: number): Nullable<Message> {
+    const foundMessage: Nullable<Message> = this.messages.find((m) => m.id === messageId);
+    return foundMessage;
   }
 
-  updateMessageById(
-    messageId: number,
-    updateMessageDto: UpdateMessageDto,
-  ): Response<Nullable<Message>> {
-    const index = this.messages.findIndex((m) => m.id === messageId);
-
-    if (index === -1) {
-      // Not found — return consistent error shape with data = undefined
-      return {
-        timestamp: new Date(),
-        type: Notification.ERROR,
-        message: `Message with ID ${messageId} not found`,
-        data: undefined,
+  updateMessageById(messageId: number, updateMessageDto: UpdateMessageDto): Nullable<Message> {
+    const foundMessage: Nullable<Message> = this.getMessageById(messageId);
+    if (foundMessage) {
+      const updatedMessage: Nullable<Message> = {
+        ...foundMessage,
+        ...updateMessageDto,
       };
+
+      this.messages = this.messages.map((m) => (m.id === messageId ? updatedMessage : m));
+      return updatedMessage;
+    } else {
+      return foundMessage;
     }
-
-    // Merge the existing message with the provided patch (updateMessageDto)
-    const updated: Message = {
-      ...this.messages[index],
-      ...updateMessageDto,
-    };
-
-    // Persist
-    this.messages = [...this.messages.slice(0, index), updated, ...this.messages.slice(index + 1)];
-
-    return {
-      timestamp: new Date(),
-      type: Notification.SUCCESS,
-      message: `Message with ID ${messageId} updated successfully`,
-      data: { ...updated }, // return copy
-    };
   }
 
-  deleteMessageById(messageId: number): Response<Nullable<Message>> {
-    const index = this.messages.findIndex((m) => m.id === messageId);
+  deleteMessageById(messageId: number): Nullable<Message> {
+    const foundMessage: Nullable<Message> = this.getMessageById(messageId);
 
-    if (index === -1) {
-      return {
-        timestamp: new Date(),
-        type: Notification.ERROR,
-        message: `Message with ID ${messageId} not found`,
-        data: undefined,
-      };
+    if (foundMessage) {
+      this.messages = this.messages.filter((m) => m.id !== messageId);
     }
-
-    const [removed] = this.messages.splice(index, 1);
-
-    return {
-      timestamp: new Date(),
-      type: Notification.SUCCESS,
-      message: `Message with ID ${messageId} deleted successfully`,
-      data: removed,
-    };
+    return foundMessage;
   }
 }
