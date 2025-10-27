@@ -16,7 +16,7 @@ export class MessagesService {
   private nextId = 4;
 
   getMessages(): Array<Message> {
-    return this.messages;
+    return [...this.messages];
   }
 
   createMessage(createMessageDto: CreateMessageDto): Message {
@@ -34,31 +34,22 @@ export class MessagesService {
   }
 
   getMessageById(messageId: number): Nullable<Message> {
-    const foundMessage: Nullable<Message> = this.messages.find((m) => m.id === messageId);
-    return foundMessage;
+    return this.messages.find((m) => m.id === messageId);
   }
 
   updateMessageById(messageId: number, updateMessageDto: UpdateMessageDto): Nullable<Message> {
     const foundMessage: Nullable<Message> = this.getMessageById(messageId);
-    if (foundMessage) {
-      const updatedMessage: Nullable<Message> = {
-        ...foundMessage,
-        ...updateMessageDto,
-      };
+    if (!foundMessage) return foundMessage;
 
-      this.messages = this.messages.map((m) => (m.id === messageId ? updatedMessage : m));
-      return updatedMessage;
-    } else {
-      return foundMessage;
-    }
+    const updatedMessage: Message = { ...foundMessage, ...updateMessageDto };
+    this.messages = this.messages.map((m) => (m.id === messageId ? updatedMessage : m));
+    return updatedMessage;
   }
 
   deleteMessageById(messageId: number): Nullable<Message> {
     const foundMessage: Nullable<Message> = this.getMessageById(messageId);
+    if (foundMessage) this.messages = this.messages.filter((m) => m.id !== messageId);
 
-    if (foundMessage) {
-      this.messages = this.messages.filter((m) => m.id !== messageId);
-    }
     return foundMessage;
   }
 }

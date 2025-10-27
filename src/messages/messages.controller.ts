@@ -34,7 +34,7 @@ export class MessagesController {
   }
 
   @Post()
-  @HttpCode(HttpStatus.CREATED) // 201 Created on success
+  @HttpCode(HttpStatus.CREATED)
   createMessage(@Body() createMessageDto: CreateMessageDto): Response<Message> {
     const newMessage: Message = this.messagesService.createMessage(createMessageDto);
     return {
@@ -46,7 +46,7 @@ export class MessagesController {
   }
 
   @Delete()
-  @HttpCode(HttpStatus.NO_CONTENT) // 204 No Content
+  @HttpCode(HttpStatus.NO_CONTENT)
   removeAll(): void {
     this.messagesService.deleteMessages();
     return;
@@ -57,16 +57,16 @@ export class MessagesController {
     const messageId: number = +id;
     const foundMessage: Nullable<Message> = this.messagesService.getMessageById(messageId);
 
-    if (foundMessage) {
-      return {
-        timestamp: new Date(),
-        type: Notification.SUCCESS,
-        message: `Message with ID ${messageId} retrieved successfully`,
-        data: foundMessage,
-      };
-    } else {
+    if (!foundMessage) {
       throw new NotFoundException(`Message with ID ${messageId} not found`);
     }
+
+    return {
+      timestamp: new Date(),
+      type: Notification.SUCCESS,
+      message: `Message with ID ${messageId} retrieved successfully`,
+      data: foundMessage,
+    };
   }
 
   @Patch(':id')
@@ -75,31 +75,33 @@ export class MessagesController {
     @Body() updateMessageDto: UpdateMessageDto,
   ): Response<Nullable<Message>> {
     const messageId: number = +id;
-    const updatedMessage = this.messagesService.updateMessageById(messageId, updateMessageDto);
+    const updatedMessage: Nullable<Message> = this.messagesService.updateMessageById(
+      messageId,
+      updateMessageDto,
+    );
 
-    if (updatedMessage) {
-      return {
-        timestamp: new Date(),
-        type: Notification.SUCCESS,
-        message: `Message with ID ${messageId} updated successfully`,
-        data: updatedMessage,
-      };
-    } else {
+    if (!updatedMessage) {
       throw new NotFoundException(`Message with ID ${messageId} not found`);
     }
+
+    return {
+      timestamp: new Date(),
+      type: Notification.SUCCESS,
+      message: `Message with ID ${messageId} updated successfully`,
+      data: updatedMessage,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteMessageById(@Param('id') id: string): void {
     const messageId: number = +id;
-    const removedMessage = this.messagesService.deleteMessageById(messageId);
+    const removedMessage: Nullable<Message> = this.messagesService.deleteMessageById(messageId);
 
     if (!removedMessage) {
-      // 204 No Content
-      return;
-    } else {
       throw new NotFoundException(`Message with ID ${messageId} not found`);
     }
+
+    return;
   }
 }
