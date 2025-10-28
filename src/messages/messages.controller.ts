@@ -9,6 +9,7 @@ import {
   HttpStatus,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -53,53 +54,50 @@ export class MessagesController {
   }
 
   @Get(':id')
-  getMessageById(@Param('id') id: string): Response<Nullable<Message>> {
-    const messageId: number = +id;
-    const foundMessage: Nullable<Message> = this.messagesService.getMessageById(messageId);
+  getMessageById(@Param('id', ParseIntPipe) id: number): Response<Nullable<Message>> {
+    const foundMessage: Nullable<Message> = this.messagesService.getMessageById(id);
 
     if (!foundMessage) {
-      throw new NotFoundException(`Message with ID ${messageId} not found`);
+      throw new NotFoundException(`Message with ID ${id} not found`);
     }
 
     return {
       timestamp: new Date(),
       type: Notification.SUCCESS,
-      message: `Message with ID ${messageId} retrieved successfully`,
+      message: `Message with ID ${id} retrieved successfully`,
       data: foundMessage,
     };
   }
 
   @Patch(':id')
   updateMessageById(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateMessageDto: UpdateMessageDto,
   ): Response<Nullable<Message>> {
-    const messageId: number = +id;
     const updatedMessage: Nullable<Message> = this.messagesService.updateMessageById(
-      messageId,
+      id,
       updateMessageDto,
     );
 
     if (!updatedMessage) {
-      throw new NotFoundException(`Message with ID ${messageId} not found`);
+      throw new NotFoundException(`Message with ID ${id} not found`);
     }
 
     return {
       timestamp: new Date(),
       type: Notification.SUCCESS,
-      message: `Message with ID ${messageId} updated successfully`,
+      message: `Message with ID ${id} updated successfully`,
       data: updatedMessage,
     };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteMessageById(@Param('id') id: string): void {
-    const messageId: number = +id;
-    const removedMessage: Nullable<Message> = this.messagesService.deleteMessageById(messageId);
+  deleteMessageById(@Param('id', ParseIntPipe) id: number): void {
+    const removedMessage: Nullable<Message> = this.messagesService.deleteMessageById(id);
 
     if (!removedMessage) {
-      throw new NotFoundException(`Message with ID ${messageId} not found`);
+      throw new NotFoundException(`Message with ID ${id} not found`);
     }
 
     return;

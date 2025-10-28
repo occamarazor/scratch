@@ -15,12 +15,8 @@ Content-Type: application/json
 }
 
 ###
-// 3.1 Get message by ID SUCCESS
+// 3. Get message by ID SUCCESS
 GET {{baseUrl}}/messages/4
-
-###
-// 3.2 Get message by ID ERROR
-GET {{baseUrl}}/messages/5
 
 ###
 // 4. Edit message (using PATCH)
