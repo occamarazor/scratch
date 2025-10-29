@@ -24,8 +24,9 @@ export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
   @Get()
-  getMessages(): Response<Array<Message>> {
-    const allMessages: Array<Message> = this.messagesService.getMessages();
+  async getMessages(): Promise<Response<Message[]>> {
+    const allMessages: Message[] = await this.messagesService.getMessages();
+
     return {
       timestamp: new Date(),
       type: Notification.SUCCESS,
@@ -36,8 +37,9 @@ export class MessagesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  createMessage(@Body() createMessageDto: CreateMessageDto): Response<Message> {
-    const newMessage: Message = this.messagesService.createMessage(createMessageDto);
+  async createMessage(@Body() createMessageDto: CreateMessageDto): Promise<Response<Message>> {
+    const newMessage: Message = await this.messagesService.createMessage(createMessageDto);
+
     return {
       timestamp: new Date(),
       type: Notification.SUCCESS,
@@ -48,18 +50,17 @@ export class MessagesController {
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeAll(): void {
-    this.messagesService.deleteMessages();
-    return;
+  async deleteMessages(): Promise<void> {
+    await this.messagesService.deleteMessages();
   }
 
   @Get(':id')
-  getMessageById(@Param('id', ParseIntPipe) id: number): Response<Nullable<Message>> {
-    const foundMessage: Nullable<Message> = this.messagesService.getMessageById(id);
+  async getMessageById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Response<Nullable<Message>>> {
+    const foundMessage: Nullable<Message> = await this.messagesService.getMessageById(id);
 
-    if (!foundMessage) {
-      throw new NotFoundException(`Message with ID ${id} not found`);
-    }
+    if (!foundMessage) throw new NotFoundException(`Message with ID ${id} not found`);
 
     return {
       timestamp: new Date(),
@@ -70,18 +71,16 @@ export class MessagesController {
   }
 
   @Patch(':id')
-  updateMessageById(
+  async updateMessageById(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateMessageDto: UpdateMessageDto,
-  ): Response<Nullable<Message>> {
-    const updatedMessage: Nullable<Message> = this.messagesService.updateMessageById(
+  ): Promise<Response<Nullable<Message>>> {
+    const updatedMessage: Nullable<Message> = await this.messagesService.updateMessageById(
       id,
       updateMessageDto,
     );
 
-    if (!updatedMessage) {
-      throw new NotFoundException(`Message with ID ${id} not found`);
-    }
+    if (!updatedMessage) throw new NotFoundException(`Message with ID ${id} not found`);
 
     return {
       timestamp: new Date(),
@@ -93,12 +92,10 @@ export class MessagesController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteMessageById(@Param('id', ParseIntPipe) id: number): void {
-    const removedMessage: Nullable<Message> = this.messagesService.deleteMessageById(id);
+  async deleteMessageById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    const removedMessage: boolean = await this.messagesService.deleteMessageById(id);
 
-    if (!removedMessage) {
-      throw new NotFoundException(`Message with ID ${id} not found`);
-    }
+    if (!removedMessage) throw new NotFoundException(`Message with ID ${id} not found`);
 
     return;
   }

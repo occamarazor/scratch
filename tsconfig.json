@@ -23,6 +23,7 @@
     "noFallthroughCasesInSwitch": false,
     "baseUrl": "src",
     "paths": {
+      "@config/*": ["config/*"],
       "@common/*": ["common/*"],
       "@messages/*": ["messages/*"]
     }

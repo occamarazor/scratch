@@ -13,27 +13,21 @@
       }
     },
     {
-      "label": "Build",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "build"],
-      "group": "build",
-      "problemMatcher": ["$tsc"],
-      "presentation": {
-        "reveal": "silent",
-        "panel": "shared"
-      }
-    },
-    {
       "label": "Start Dev",
       "type": "shell",
       "command": "pnpm",
       "args": ["run", "start:dev"],
       "isBackground": true,
-      "problemMatcher": [],
       "presentation": {
         "reveal": "always",
-        "panel": "dedicated"
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
       }
     },
     {
@@ -47,6 +41,18 @@
         "reveal": "always",
         "panel": "dedicated"
       }
+    },
+    {
+      "label": "Build",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "build"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$tsc"],
+      "group": "build"
     },
     {
       "label": "Start Prod",
@@ -87,11 +93,91 @@
       "type": "shell",
       "command": "pnpm",
       "args": ["run", "test"],
-      "problemMatcher": ["$jest-stare"],
       "presentation": {
         "reveal": "always",
         "panel": "shared"
-      }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start DB (docker-compose)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "db:up"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop DB (docker-compose)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "db:down"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Log DB (docker-compose)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "db:logs"],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "showReuseMessage": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Seed",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "seed:run"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+
+    {
+      "label": "pnpm: migrate:generate",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "migrate:generate"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "pnpm: migrate:run",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "migrate:run"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "pnpm: migrate:revert",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "migrate:revert"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
     }
   ]
 }

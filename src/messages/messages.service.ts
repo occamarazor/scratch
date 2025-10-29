@@ -1,55 +1,60 @@
 import type { Nullable } from '@common/types';
-import type { Message } from '@messages/messages.types';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { DeleteResult } from 'typeorm';
 
 import CreateMessageDto from './dto/create-message.dto';
 import UpdateMessageDto from './dto/update-message.dto';
+import { MessageEntity } from './entities/message.entity';
+import type { Message } from './messages.types';
 
 @Injectable()
 export class MessagesService {
-  // TODO: fake dataset
-  private messages: Array<Message> = [
-    { id: 1, content: 'Random message number UNO' },
-    { id: 2, content: 'Random message number DOS' },
-    { id: 3, content: 'Random message number TRES' },
-  ];
-  private nextId = 4;
+  constructor(
+    @InjectRepository(MessageEntity)
+    private readonly messagesRepository: Repository<MessageEntity>,
+  ) {}
 
-  getMessages(): Array<Message> {
-    return [...this.messages];
+  private toDomain(e: MessageEntity): Message {
+    return { id: e.id, content: e.content, createdAt: e.createdAt, updatedAt: e.updatedAt };
   }
 
-  createMessage(createMessageDto: CreateMessageDto): Message {
-    const newMessage: Message = {
-      id: this.nextId++,
-      content: createMessageDto.content,
-    };
-
-    this.messages = [...this.messages, newMessage];
-    return newMessage;
+  async getMessages(): Promise<Message[]> {
+    const entities: MessageEntity[] = await this.messagesRepository.find({ order: { id: 'ASC' } });
+    return entities.map((e) => this.toDomain(e));
   }
 
-  deleteMessages(): void {
-    this.messages = [];
+  async createMessage(dto: CreateMessageDto): Promise<Message> {
+    const entity: MessageEntity = this.messagesRepository.create({ content: dto.content });
+    const saved: MessageEntity = await this.messagesRepository.save(entity);
+    return this.toDomain(saved);
   }
 
-  getMessageById(messageId: number): Nullable<Message> {
-    return this.messages.find((m) => m.id === messageId);
+  async deleteMessages(): Promise<void> {
+    await this.messagesRepository.clear();
   }
 
-  updateMessageById(messageId: number, updateMessageDto: UpdateMessageDto): Nullable<Message> {
-    const foundMessage: Nullable<Message> = this.getMessageById(messageId);
-    if (!foundMessage) return foundMessage;
-
-    const updatedMessage: Message = { ...foundMessage, ...updateMessageDto };
-    this.messages = this.messages.map((m) => (m.id === messageId ? updatedMessage : m));
-    return updatedMessage;
+  async getMessageById(id: number): Promise<Nullable<Message>> {
+    const entity: Nullable<MessageEntity> = await this.messagesRepository.findOne({
+      where: { id },
+    });
+    return entity ? this.toDomain(entity) : undefined;
   }
 
-  deleteMessageById(messageId: number): Nullable<Message> {
-    const foundMessage: Nullable<Message> = this.getMessageById(messageId);
-    if (foundMessage) this.messages = this.messages.filter((m) => m.id !== messageId);
+  async updateMessageById(id: number, dto: UpdateMessageDto): Promise<Nullable<Message>> {
+    const entity: Nullable<MessageEntity> = await this.messagesRepository.findOne({
+      where: { id },
+    });
+    if (!entity) return undefined;
 
-    return foundMessage;
+    this.messagesRepository.merge(entity, dto as Partial<MessageEntity>);
+    const saved: MessageEntity = await this.messagesRepository.save(entity);
+    return this.toDomain(saved);
+  }
+
+  async deleteMessageById(id: number): Promise<boolean> {
+    const result: DeleteResult = await this.messagesRepository.delete(id);
+    return (result.affected ?? 0) === 1;
   }
 }
