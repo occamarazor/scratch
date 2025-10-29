@@ -3,8 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { MessageEntity } from './entities/message.entity';
-import { MessagesService } from './messages.service';
+import { MessageEntity } from '../entities/message.entity';
+import { MessagesService } from '../messages.service';
 
 describe('MessagesService', () => {
   let service: MessagesService;

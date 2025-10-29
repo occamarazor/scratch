@@ -1,5 +1,7 @@
-export default () => ({
-  nodeEnv: process.env.NODE_ENV ?? 'development',
+import type { AppConfig } from './config.types';
+
+const configuration = (): AppConfig => ({
+  nodeEnv: (process.env.NODE_ENV ?? 'development') as AppConfig['nodeEnv'],
   port: Number(process.env.PORT ?? 3000),
   database: {
     host: process.env.DATABASE_HOST ?? 'localhost',
@@ -9,3 +11,5 @@ export default () => ({
     password: process.env.DATABASE_PASSWORD ?? 'postgres',
   },
 });
+
+export default configuration;

@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 
+// TODO: path
 import dataSource from '../src/data-source';
 import { MessageEntity } from '../src/messages/entities/message.entity';
 
