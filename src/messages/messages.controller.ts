@@ -36,7 +36,7 @@ export class MessagesController {
   }
 
   @Post()
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.I_AM_A_TEAPOT)
   async createMessage(@Body() createMessageDto: CreateMessageDto): Promise<Response<Message>> {
     const newMessage: Message = await this.messagesService.createMessage(createMessageDto);
 

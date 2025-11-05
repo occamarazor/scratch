@@ -1,9 +1,7 @@
 import 'reflect-metadata';
 
+import configuration from '@config/configuration';
 import { DataSource } from 'typeorm';
-
-// TODO: path
-import configuration from './config/configuration';
 
 const cfg = configuration();
 

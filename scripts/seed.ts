@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 
-// TODO: path
+import { MessageEntity } from '@messages/entities/message.entity';
+
 import dataSource from '../src/data-source';
-import { MessageEntity } from '../src/messages/entities/message.entity';
 
 const seed = async () => {
   await dataSource.initialize();

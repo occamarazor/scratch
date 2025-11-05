@@ -15,14 +15,16 @@ import { MessagesModule } from './messages/messages.module';
       load: [configuration],
       validationSchema,
       cache: true,
-      envFilePath: ['.env.development', '.env'],
+      envFilePath: ['src/messages/.env.development', 'src/messages/.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (cfg: ConfigService<AppConfig>): TypeOrmModuleOptions => {
         const db = cfg.get<DatabaseConfig>('database', { infer: true }) as DatabaseConfig;
+
         if (!db) throw new Error('Database configuration not found');
+
         const nodeEnv = cfg.get<AppConfig['nodeEnv']>('nodeEnv', { infer: true });
         const isDev = nodeEnv === 'development';
 
