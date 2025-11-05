@@ -1,3 +1,7 @@
+import { Nullable } from '@common/types';
+
+export type NodeEnv = 'development' | 'test' | 'production';
+
 export interface DatabaseConfig {
   host: string;
   port: number;
@@ -6,8 +10,16 @@ export interface DatabaseConfig {
   password: string;
 }
 
+export interface AuthConfig {
+  jwtSecret: Nullable<string>; // Allow bootstrapping without a secret in early dev
+  jwtExpiresIn: string;
+}
+
 export interface AppConfig {
-  nodeEnv: 'development' | 'test' | 'production';
+  appName: string;
+  nodeEnv: NodeEnv;
   port: number;
+  frontendUrl: Nullable<string>; // Useful for CORS
   database: DatabaseConfig;
+  auth: AuthConfig;
 }
