@@ -4,27 +4,29 @@
     {
       "label": "App: Install",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["install"],
+      "command": "pnpm install",
       "problemMatcher": [],
+      "detail": "Install project dependencies with pnpm",
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
       }
     },
     {
       "label": "App: Dev",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "start:dev"],
+      "command": "pnpm start:dev",
       "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Start NestJS in watch mode (dev)",
       "presentation": {
         "reveal": "always",
         "panel": "shared",
         "showReuseMessage": true,
         "clear": false
       },
-      "problemMatcher": [],
       "group": {
         "kind": "build",
         "isDefault": true
@@ -33,151 +35,161 @@
     {
       "label": "App: Debug",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "start:debug"],
+      "command": "pnpm start:debug",
       "isBackground": true,
       "problemMatcher": [],
+      "detail": "Start NestJS with Node inspector enabled for debugger attach",
       "presentation": {
         "reveal": "always",
-        "panel": "dedicated"
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
       }
     },
     {
       "label": "App: Build",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "build"],
+      "command": "pnpm build",
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
       },
       "problemMatcher": ["$tsc"],
-      "group": "build"
+      "group": "build",
+      "detail": "Compile TypeScript to the dist/ directory"
     },
     {
       "label": "App: Prod",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "start:prod"],
+      "command": "pnpm start:prod",
       "isBackground": true,
       "problemMatcher": [],
+      "detail": "Run the production build from dist/",
       "presentation": {
         "reveal": "always",
-        "panel": "dedicated"
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
       }
     },
     {
       "label": "App: Format",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "format"],
+      "command": "pnpm format",
       "problemMatcher": [],
+      "detail": "Run Prettier to format source files",
       "presentation": {
         "reveal": "silent",
-        "panel": "shared"
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
       }
     },
     {
       "label": "App: Lint",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "lint"],
+      "command": "pnpm lint",
       "problemMatcher": ["$eslint-stylish"],
+      "detail": "Run ESLint and auto-fix",
       "presentation": {
         "reveal": "silent",
-        "panel": "shared"
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
       }
     },
     {
-      "label": "App: Test",
+      "label": "App: Test - Unit",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "test"],
+      "command": "pnpm test",
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Run unit tests with Jest"
     },
     {
-      "label": "DB: Start",
+      "label": "App: Test - E2E",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "db:up"],
+      "command": "pnpm test:e2e",
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "Run end-to-end tests (test/jest-e2e.json)"
     },
     {
-      "label": "DB: Stop",
+      "label": "Docker: Up",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "db:down"],
+      "command": "pnpm docker:up",
+      "problemMatcher": [],
+      "detail": "Start Docker Compose services (Postgres, etc.)",
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": []
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      }
     },
     {
-      "label": "DB: Log",
+      "label": "Docker: Down",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "db:logs"],
-      "isBackground": true,
+      "command": "pnpm docker:down",
+      "problemMatcher": [],
+      "detail": "Stop and remove Docker Compose services",
       "presentation": {
         "reveal": "always",
-        "panel": "dedicated",
-        "showReuseMessage": true
-      },
-      "problemMatcher": []
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
     },
     {
-      "label": "DB: Seed",
+      "label": "Docker: Reset",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "seed:run"],
+      "command": "pnpm docker:reset",
+      "problemMatcher": [],
+      "detail": "Destroy volumes and start Docker Compose fresh",
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": []
-    },
-
-    {
-      "label": "DB: Migrations - Generate",
-      "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "migrate:generate"],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": []
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
     },
     {
-      "label": "DB: Migrations - Run",
+      "label": "DB: Migrate",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "migrate:run"],
+      "command": "pnpm db:migrate",
+      "problemMatcher": [],
+      "detail": "Run TypeORM migrations against the configured DB",
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": []
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
     },
     {
-      "label": "DB: Migrations - Revert",
+      "label": "DB: Revert Last Migration",
       "type": "shell",
-      "command": "pnpm",
-      "args": ["run", "migrate:revert"],
+      "command": "pnpm db:revert",
+      "problemMatcher": [],
+      "detail": "Revert the last TypeORM migration",
       "presentation": {
         "reveal": "always",
-        "panel": "shared"
-      },
-      "problemMatcher": []
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
     }
   ]
 }

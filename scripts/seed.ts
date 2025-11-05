@@ -4,6 +4,7 @@ import { MessageEntity } from '@messages/entities/message.entity';
 
 import dataSource from '../src/data-source';
 
+// TODO: seed new TaskEntity repo
 const seed = async () => {
   await dataSource.initialize();
   const repo = dataSource.getRepository(MessageEntity);

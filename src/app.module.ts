@@ -1,21 +1,19 @@
+import type { AppConfig, DatabaseConfig } from '@config/config.types';
+import configuration from '@config/configuration';
+import validationSchema from '@config/validation';
+import { MessagesModule } from '@messages/messages.module'; // or TasksModule once created
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-import type { AppConfig, DatabaseConfig } from './config/config.types';
-import configuration from './config/configuration';
-import validationSchema from './config/validation';
-import { MessagesModule } from './messages/messages.module';
-
-// TODO: move & type the whole config
 @Module({
   imports: [
-    ConfigModule.forRoot({
+    ConfigModule.forRoot<AppConfig>({
       isGlobal: true,
       load: [configuration],
       validationSchema,
       cache: true,
-      envFilePath: ['src/messages/.env.development', 'src/messages/.env'],
+      envFilePath: ['.env.dev', '.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -25,20 +23,20 @@ import { MessagesModule } from './messages/messages.module';
 
         if (!db) throw new Error('Database configuration not found');
 
-        const nodeEnv = cfg.get<AppConfig['nodeEnv']>('nodeEnv', { infer: true });
+        const nodeEnv = cfg.get<AppConfig['nodeEnv']>('nodeEnv', { infer: true }) ?? 'development';
         const isDev = nodeEnv === 'development';
 
         return {
           type: 'postgres',
           host: db.host,
           port: db.port,
-          database: db.name,
           username: db.user,
           password: db.password,
+          database: db.name,
           autoLoadEntities: true,
-          synchronize: isDev,
+          synchronize: isDev, // only in dev
           logging: isDev ? ['error', 'warn', 'query'] : ['error'],
-        } as const;
+        } as TypeOrmModuleOptions;
       },
     }),
     MessagesModule,
