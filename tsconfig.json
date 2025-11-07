@@ -25,7 +25,8 @@
     "paths": {
       "@config/*": ["config/*"],
       "@common/*": ["common/*"],
-      "@messages/*": ["messages/*"]
+      "@messages/*": ["messages/*"],
+      "@tasks/*": ["tasks/*"]
     }
   }
 }
