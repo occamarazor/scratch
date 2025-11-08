@@ -36,16 +36,15 @@ export class MessagesService {
   }
 
   async getMessageById(id: number): Promise<Nullable<Message>> {
-    const entity: Nullable<MessageEntity> = await this.messagesRepository.findOne({
-      where: { id },
-    });
+    const entity: Nullable<MessageEntity> =
+      (await this.messagesRepository.findOne({ where: { id } })) ?? undefined;
     return entity ? this.toDomain(entity) : undefined;
   }
 
   async updateMessageById(id: number, dto: UpdateMessageDto): Promise<Nullable<Message>> {
-    const entity: Nullable<MessageEntity> = await this.messagesRepository.findOne({
-      where: { id },
-    });
+    const entity: Nullable<MessageEntity> =
+      (await this.messagesRepository.findOne({ where: { id } })) ?? undefined;
+
     if (!entity) return undefined;
 
     this.messagesRepository.merge(entity, dto as Partial<MessageEntity>);

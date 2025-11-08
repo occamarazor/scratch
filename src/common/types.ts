@@ -1,4 +1,4 @@
-export type Nullable<T> = T | undefined | null;
+export type Nullable<T> = T | undefined;
 
 export enum Notification {
   INFO = 'INFO',

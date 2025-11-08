@@ -1,8 +1,7 @@
 import type { Nullable } from '@common/types';
 
-import { TaskStatus } from '../tasks.types';
-import { Task } from '../tasks.types';
-
+import type { Task, TaskStatus } from '../tasks.types';
+// TODO: currently not used
 export class TaskResponseDto implements Task {
   id!: number;
   title!: string;
