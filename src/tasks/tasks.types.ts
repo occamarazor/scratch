@@ -15,3 +15,7 @@ export interface Task {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface TasksUpdateResponse {
+  affectedTasks: number;
+}

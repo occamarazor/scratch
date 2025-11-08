@@ -9,8 +9,20 @@ const seed = async () => {
 
   await tasksRepo.clear();
   await tasksRepo.save([
-    { title: 'Buy groceries', description: 'Milk, eggs', status: 'TODO', priority: 1 },
-    { title: 'Prepare demo', description: 'Slides', status: 'IN_PROGRESS', priority: 2 },
+    {
+      title: 'Buy groceries',
+      description: 'Milk, eggs',
+      status: 'TODO',
+      priority: 1,
+      ownerId: 1,
+    },
+    {
+      title: 'Prepare demo',
+      description: 'Slides',
+      status: 'IN_PROGRESS',
+      priority: 2,
+      ownerId: 1,
+    },
   ]);
 
   await AppDataSource.destroy();

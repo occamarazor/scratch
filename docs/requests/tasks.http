@@ -74,5 +74,5 @@ Content-Type: application/json
 DELETE {{baseUrl}}/api/tasks/1
 
 ###
-# Delete all tasks (DANGEROUS - DEV only)
+# Delete all tasks (CAUTION - DEV only)
 DELETE {{baseUrl}}/api/tasks
