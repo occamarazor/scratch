@@ -19,10 +19,11 @@ import {
 } from '@nestjs/common';
 
 import { CreateTaskDto } from './dto/create-task.dto';
-import { TaskResponseDto } from './dto/task-response.dto';
+import type { TaskResponseDto } from './dto/task-response.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 import type { Task, TasksUpdateResponse } from './tasks.types';
+
 @Controller('/api/tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
@@ -46,7 +47,6 @@ export class TasksController {
   }
 
   @Patch()
-  @UsePipes(new ValidationPipe({ transform: true }))
   async updateTasks(
     @Body() body: { ids: number[]; patch: Partial<UpdateTaskDto> },
   ): Promise<TasksUpdateResponse> {

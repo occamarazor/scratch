@@ -1,10 +1,12 @@
 import type { Nullable } from '@common/types';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToInstance } from 'class-transformer';
+import { validateOrReject, ValidationError } from 'class-validator';
 import { DeleteResult, Repository } from 'typeorm';
 
-import { CreateTaskDto } from './dto/create-task.dto';
-import { TaskResponseDto } from './dto/task-response.dto';
+import type { CreateTaskDto } from './dto/create-task.dto';
+import type { TaskResponseDto } from './dto/task-response.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskEntity } from './entities/task.entity';
 import type { Task } from './tasks.types';
@@ -66,15 +68,53 @@ export class TasksService {
     return this.entityToDomain(taskEntitySaved);
   }
 
-  // TODO: validate bulk updates!
   async updateTasks(ids: number[], patch: Partial<UpdateTaskDto>): Promise<number> {
+    // Validate patch using UpdateTaskDto rules
+    const dtoInstance = plainToInstance(UpdateTaskDto, patch);
+
+    try {
+      await validateOrReject(dtoInstance, {
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        validationError: { target: false },
+      });
+    } catch (errors) {
+      const validationErrors = Array.isArray(errors)
+        ? (errors as ValidationError[])
+        : [errors as ValidationError];
+
+      const messages = validationErrors
+        .map((e) => {
+          if (e.constraints) {
+            return Object.values(e.constraints).join(', ');
+          }
+
+          if (e.children && e.children.length > 0) {
+            return e.children
+              .map((child) =>
+                child.constraints
+                  ? Object.values(child.constraints).join(', ')
+                  : JSON.stringify(child),
+              )
+              .join(', ');
+          }
+
+          return JSON.stringify(e);
+        })
+        .join('; ');
+
+      throw new BadRequestException(`Invalid patch payload: ${messages}`);
+    }
+
+    // Build update payload (convert dueAt to Date if present)
     const updatePayload: Partial<TaskEntity> = { ...(patch as Partial<TaskEntity>) };
 
     if (patch.dueAt !== undefined) {
-      const v = patch.dueAt as unknown as Nullable<string>;
-      updatePayload.dueAt = v && v !== '' ? new Date(v) : undefined;
+      const value = patch.dueAt as Nullable<string>;
+      updatePayload.dueAt = value ? new Date(value) : undefined;
     }
 
+    // Execute bulk update
     const res = await this.tasksRepository
       .createQueryBuilder()
       .update(TaskEntity)

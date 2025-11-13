@@ -5,29 +5,32 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Max,
+  MaxLength,
   Min,
 } from 'class-validator';
 
-import { TASK_STATUS_VALUES } from '../tasks.constants';
-import type { TaskStatus } from '../tasks.types';
-
-const taskStatusOptions: TaskStatus[] = Object.values(TASK_STATUS_VALUES);
+import { TaskStatus } from '../tasks.types';
 
 export class CreateTaskDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(255)
   title!: string;
 
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(1000)
   @IsOptional()
   description?: string;
 
-  @IsEnum(taskStatusOptions)
+  @IsEnum(TaskStatus)
   @IsOptional()
   status?: TaskStatus;
 
   @IsInt()
   @Min(0)
+  @Max(4)
   @IsOptional()
   priority?: number;
 

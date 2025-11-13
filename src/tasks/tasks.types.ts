@@ -1,8 +1,10 @@
 import { Nullable } from '@common/types';
 
-import { TASK_STATUS_VALUES } from './tasks.constants';
-
-export type TaskStatus = (typeof TASK_STATUS_VALUES)[keyof typeof TASK_STATUS_VALUES];
+export enum TaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+}
 
 export interface Task {
   id: number;

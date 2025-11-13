@@ -13,7 +13,7 @@ GET {{baseUrl}}/api/tasks?ownerId=1
 Accept: application/json
 
 ###
-# Create a task (valid)
+# Create a task (dueAt=null gets omitted)
 POST {{baseUrl}}/api/tasks
 Content-Type: application/json
 
@@ -21,17 +21,51 @@ Content-Type: application/json
   "title": "Write project README",
   "description": "Draft README for Scratch app",
   "priority": 2,
-  "dueAt": "2025-12-01T12:00:00.000Z"
+  "dueAt": null
 }
 
 ###
-# Create a task (missing title -> 400 validation error)
+# Create a task (title=undefined -> 400 validation errors)
 POST {{baseUrl}}/api/tasks
 Content-Type: application/json
 
 {
   "description": "This request is invalid because title is missing"
 }
+
+###
+# Bulk partial update (set status for multiple tasks)
+PATCH {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "ids": [1, 2],
+  "patch": {
+    "status": "IN_PROGRESS",
+    "priority": 4,
+  }
+}
+
+###
+# Bulk partial update (400 validation errors)
+PATCH {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "ids": [1, 2],
+  "patch": {
+    "title": "",
+    "descript": "Mistyped prop",
+    "status": "FAKE_STATUS",
+    "priority": 5,
+    "dueAt": ""
+  }
+}
+
+###
+# Delete all tasks (CAUTION - DEV only)
+DELETE {{baseUrl}}/api/tasks
+
 
 ###
 # Get a single task (replace :id as needed)
@@ -49,7 +83,7 @@ Content-Type: application/json
 }
 
 ###
-# Update a task (null dueAt -> 400 validation error)
+# Update a task (dueAt=null -> 400 validation error)
 PATCH {{baseUrl}}/api/tasks/1
 Content-Type: application/json
 
@@ -58,21 +92,5 @@ Content-Type: application/json
 }
 
 ###
-# Bulk update (set status for multiple tasks)
-PATCH {{baseUrl}}/api/tasks
-Content-Type: application/json
-
-{
-  "ids": [2, 3],
-  "patch": {
-    "status": "IN_PROGRESS"
-  }
-}
-
-###
 # Delete a single task
 DELETE {{baseUrl}}/api/tasks/1
-
-###
-# Delete all tasks (CAUTION - DEV only)
-DELETE {{baseUrl}}/api/tasks

@@ -1,5 +1,6 @@
 import type { Nullable } from '@common/types';
 import {
+  Check,
   Column,
   CreateDateColumn,
   Entity,
@@ -8,21 +9,27 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import type { TaskStatus } from '../tasks.types';
+import { TaskStatus } from '../tasks.types';
 
 @Entity('tasks')
 @Index(['ownerId', 'status', 'priority'])
+@Check(`"priority" >= 0 AND "priority" <= 4`) // 0–4 range enforced
 export class TaskEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'varchar', length: 255 }) // strict length
   title!: string;
 
   @Column({ type: 'text', nullable: true })
   description?: Nullable<string>;
 
-  @Column({ type: 'varchar', length: 20, default: 'TODO' })
+  @Column({
+    type: 'varchar',
+    length: 11, // strict length
+    default: TaskStatus.TODO,
+    enum: Object.values(TaskStatus),
+  })
   status!: TaskStatus;
 
   @Column({ type: 'int', default: 0 })
