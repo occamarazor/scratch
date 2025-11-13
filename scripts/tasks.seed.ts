@@ -12,7 +12,7 @@ const seed = async () => {
     {
       title: 'Buy groceries',
       description: 'Milk, eggs',
-      status: 'TODO',
+      status: 'DONE',
       priority: 1,
       ownerId: 1,
     },
@@ -20,8 +20,17 @@ const seed = async () => {
       title: 'Prepare demo',
       description: 'Slides',
       status: 'IN_PROGRESS',
-      priority: 2,
+      priority: 3,
+      dueAt: '2025-10-01T12:00:00.000Z',
       ownerId: 1,
+    },
+    {
+      title: 'Walk',
+      description: 'At the park',
+      status: 'TODO',
+      priority: 4,
+      dueAt: '2025-11-01T12:00:00.000Z',
+      ownerId: 0,
     },
   ]);
 

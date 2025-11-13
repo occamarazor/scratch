@@ -33,5 +33,5 @@ export class CreateTaskDto {
 
   @IsDateString()
   @IsOptional()
-  dueAt?: string; // ISO date string
+  dueAt?: string; // ISO date string, null omitted
 }

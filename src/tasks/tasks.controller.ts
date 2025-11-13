@@ -46,6 +46,7 @@ export class TasksController {
   }
 
   @Patch()
+  @UsePipes(new ValidationPipe({ transform: true }))
   async updateTasks(
     @Body() body: { ids: number[]; patch: Partial<UpdateTaskDto> },
   ): Promise<TasksUpdateResponse> {

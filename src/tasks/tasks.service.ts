@@ -33,7 +33,18 @@ export class TasksService {
 
   // Maps business logic model Task to API model TaskResponseDto
   domainToResponse(task: Task): TaskResponseDto {
-    return { ...task };
+    return {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      ownerId: task.ownerId,
+      // Dates as ISO strings (safe for FE)
+      dueAt: task.dueAt ? new Date(task.dueAt).toISOString() : undefined,
+      createdAt: task.createdAt.toISOString(),
+      updatedAt: task.updatedAt.toISOString(),
+    };
   }
 
   async getTasks(ownerId?: number): Promise<Task[]> {
@@ -55,9 +66,10 @@ export class TasksService {
     return this.entityToDomain(taskEntitySaved);
   }
 
+  // TODO: validate bulk updates!
   async updateTasks(ids: number[], patch: Partial<UpdateTaskDto>): Promise<number> {
     const updatePayload: Partial<TaskEntity> = { ...(patch as Partial<TaskEntity>) };
-    // Convert dueAt if present in patch (treat empty string as "unset")
+
     if (patch.dueAt !== undefined) {
       const v = patch.dueAt as unknown as Nullable<string>;
       updatePayload.dueAt = v && v !== '' ? new Date(v) : undefined;
@@ -90,14 +102,10 @@ export class TasksService {
 
     if (!taskEntityUpdated) return undefined;
 
-    const { dueAt: dueAtStr, ...rest } = dto;
-    // Normalize into Nullable<Date>
-    const dueAt: Nullable<Date> =
-      dueAtStr !== undefined && dueAtStr !== '' ? new Date(dueAtStr) : undefined;
-    // Build patch WITHOUT carrying the raw string dueAt
+    const { dueAt, ...rest } = dto;
     const patch: Partial<TaskEntity> = {
       ...(rest as Partial<TaskEntity>),
-      dueAt,
+      ...(dueAt !== undefined ? { dueAt: new Date(dueAt) } : {}),
     };
 
     this.tasksRepository.merge(taskEntityUpdated, patch);

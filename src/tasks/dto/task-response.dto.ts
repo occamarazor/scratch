@@ -1,23 +1,19 @@
-import type { Nullable } from '@common/types';
+import { Nullable } from '@common/types';
 
-import type { Task, TaskStatus } from '../tasks.types';
+import type { TaskStatus } from '../tasks.types';
 
 /**
- * Response DTO for Tasks.
- *
- * Currently mirrors the domain Task shape, but kept as a DTO so you can:
- * - hide internal fields later
- * - change formats (e.g. date strings) for clients
- * - add @Expose/@Transform when needed
+ * Response model for API clients
+ * Dates are serialized as ISO strings for predictable JSON output
  */
-export class TaskResponseDto implements Task {
+export class TaskResponseDto {
   id!: number;
   title!: string;
   description?: Nullable<string>;
   status!: TaskStatus;
   priority!: number;
-  dueAt?: Nullable<Date>;
+  dueAt?: Nullable<string>;
   ownerId?: Nullable<number>;
-  createdAt!: Date;
-  updatedAt!: Date;
+  createdAt!: string;
+  updatedAt!: string;
 }
