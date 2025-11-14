@@ -20,12 +20,12 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down -v",
-    "docker:reset": "docker compose down -v && docker compose up -d",
+    "docker:restart": "docker compose down -v && docker compose up -d",
     "db:create": "psql postgresql://postgres:postgres@localhost:5432/postgres -c \"CREATE DATABASE scratch_db;\"",
     "db:drop": "psql postgresql://postgres:postgres@localhost:5432/postgres -c \"DROP DATABASE IF EXISTS scratch_db;\"",
-    "migrate:generate": "npx typeorm migration:generate -d src/data-source.ts ./src/migrations/$(date +%s)-migration",
-    "migrate:run": "npx typeorm migration:run -d src/data-source.ts",
-    "migrate:revert": "npx typeorm migration:revert -d src/data-source.ts",
+    "migrate:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/data-source.ts ./src/migrations/$(date +%s)-migration",
+    "migrate:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/data-source.ts",
+    "migrate:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d src/data-source.ts",
     "seed:tasks": "ts-node -r tsconfig-paths/register ./scripts/tasks.seed.ts"
   },
   "dependencies": {

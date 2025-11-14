@@ -153,9 +153,9 @@
       }
     },
     {
-      "label": "Docker: Reset",
+      "label": "Docker: Restart",
       "type": "shell",
-      "command": "pnpm docker:reset",
+      "command": "pnpm docker:restart",
       "problemMatcher": [],
       "detail": "Destroy volumes and start Docker Compose fresh",
       "presentation": {

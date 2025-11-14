@@ -34,7 +34,8 @@ import { TasksModule } from '@tasks/tasks.module';
           password: db.password,
           database: db.name,
           autoLoadEntities: true,
-          synchronize: isDev, // only in dev
+          // Do NOT use synchronize in prod; for dev set via env
+          synchronize: false,
           logging: isDev ? ['error', 'warn', 'query'] : ['error'],
         } as TypeOrmModuleOptions;
       },
