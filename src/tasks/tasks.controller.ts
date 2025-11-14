@@ -32,6 +32,8 @@ export class TasksController {
   async getTasks(
     @Query('ownerId', ParseNullableIntPipe) ownerId?: number,
   ): Promise<TaskResponseDto[]> {
+    // TODO: fix validation, query tries to parse ownerId as number showing NaN instead of initial input
+    // console.log('ownerId: ', ownerId);
     const tasksList: Task[] = await this.tasksService.getTasks(ownerId);
     return tasksList.map((t) => this.tasksService.domainToResponse(t));
   }

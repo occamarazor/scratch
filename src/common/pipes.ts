@@ -1,8 +1,10 @@
 import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 
+import type { Nullable } from './types';
+
 @Injectable()
-export class ParseNullableIntPipe implements PipeTransform<string | undefined, number | undefined> {
-  transform(value: string | undefined): number | undefined {
+export class ParseNullableIntPipe implements PipeTransform<Nullable<string>, Nullable<number>> {
+  transform(value: Nullable<string>): Nullable<number> {
     // Missing or blank -> undefined (treat as absent)
     if (value === undefined || value === '') return undefined;
 

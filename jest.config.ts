@@ -12,9 +12,7 @@ const config: Config.InitialOptions = {
   roots: ['<rootDir>/src'],
   moduleNameMapper: {
     '^@common/(.*)$': '<rootDir>/src/common/$1',
-    '^@messages/(.*)$': '<rootDir>/src/messages/$1',
-    // If you import '@common' without trailing slash
-    '^@common$': '<rootDir>/src/common/index.ts',
+    '^@tasks/(.*)$': '<rootDir>/src/tasks/$1',
   },
 };
 

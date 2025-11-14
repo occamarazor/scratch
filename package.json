@@ -26,7 +26,6 @@
     "migrate:generate": "npx typeorm migration:generate -d src/data-source.ts ./src/migrations/$(date +%s)-migration",
     "migrate:run": "npx typeorm migration:run -d src/data-source.ts",
     "migrate:revert": "npx typeorm migration:revert -d src/data-source.ts",
-    "seed:messages": "ts-node -r tsconfig-paths/register ./scripts/messages.seed.ts",
     "seed:tasks": "ts-node -r tsconfig-paths/register ./scripts/tasks.seed.ts"
   },
   "dependencies": {

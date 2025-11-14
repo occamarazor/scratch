@@ -1,7 +1,6 @@
 import type { AppConfig, DatabaseConfig } from '@config/config.types';
 import configuration from '@config/configuration';
 import validationSchema from '@config/validation';
-import { MessagesModule } from '@messages/messages.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
@@ -40,7 +39,6 @@ import { TasksModule } from '@tasks/tasks.module';
         } as TypeOrmModuleOptions;
       },
     }),
-    MessagesModule,
     TasksModule,
   ],
 })
