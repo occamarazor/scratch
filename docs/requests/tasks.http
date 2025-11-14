@@ -42,7 +42,7 @@ Content-Type: application/json
   "ids": [1, 2],
   "patch": {
     "status": "IN_PROGRESS",
-    "priority": 4,
+    "priority": 4
   }
 }
 
