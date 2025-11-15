@@ -1,98 +1,240 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🧩 Scratch — Task Management API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Scratch is a clean, modular, production-ready NestJS + TypeScript backend service that provides a
+robust Task Management API. It uses PostgreSQL, TypeORM, strong DTO validation, and modern
+development tooling. This project is designed for clarity, maintainability, and future expansion
+(authentication, observability, CI/CD, deployments, SAAS, etc.).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## ✨ Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### ✅ Implemented in Phase 1
 
-## Project setup
+- NestJS modular architecture
+- Tasks module
+  - Get task list
+  - Create task
+  - Bulk tasks update
+  - Delete all tasks
+  - Get specific task
+  - Update task
+  - Patch task
+  - Delete task
+- DTO validation
+  - Title (required, max length)
+  - Description (optional, max length)
+  - Status strict enum (`TODO`, `IN_PROGRESS`, `DONE`)
+  - Priority range validation (0–4)
+  - ISO date strings with proper parsing
+- Robust TypeORM entity with constraints
+  - CHECK constraint on priority range
+  - INDEX on (ownerId, status, priority)
+- Migrations
+  - Full DataSource setup
+  - First migration: tasks table
+- Docker-based PostgreSQL development environment
+- TSConfig path aliases
+- ESLint + Prettier
+- Error handling through Nest pipes
 
-```bash
-$ pnpm install
+---
+
+## 📂 Structure
+
+```
+├── src/
+│   ├── common/                   # Reusable (decorators, pipes, types)
+│   ├── config/                   # App configs, schema validation
+│   ├── migrations/               # TypeORM migrations (source)
+│   ├── tasks/                    # Tasks feature module
+│   │   ├── dto/                  # Request/response DTOs
+│   │   ├── entities/             # TypeORM entity definitions
+│   │   ├── tests/                # Unit tests for this module
+│   │   ├── tasks.controller.ts
+│   │   ├── tasks.service.ts
+│   │   ├── tasks.module.ts
+│   │   └── tasks.types.ts
+│   ├── app.module.ts             # Root module
+│   ├── data-source.ts            # TypeORM CLI datasource
+│   └── main.ts                   # Application entrypoint
+├── test/                         # E2E tests (Jest + Supertest)
+├── docs/
+│   └── requests/                 # HTTP request examples (REST client)
+├── scripts/                      # DB seeding or helper scripts
+├── .vscode/                      # VSCode config (launch, tasks)
+├── .env.dev                      # Development environment variables
+├── docker-compose.yml            # Local Postgres services
+├── package.json
+├── tsconfig.json
+└── README.md
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ pnpm run start
+## 🧱 Requirements
 
-# watch mode
-$ pnpm run start:dev
+- Node.js >= 22
+- pnpm >= 10
+- Docker & Docker Compose
+- PostgreSQL 16 (via Docker)
 
-# production mode
-$ pnpm run start:prod
+---
+
+## ⚙️ Environment
+
+- .env.dev – development environment (committed, has priority)
+- .env – optional local override
+
+```
+APP_NAME=Scratch
+NODE_ENV=development
+PORT=3000
+FRONTEND_URL=http://localhost:5173
+
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=scratch_db
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+
+JWT_SECRET=
+JWT_EXPIRES_IN=1h
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ pnpm run test
+## ▶️ Running the Project
 
-# e2e tests
-$ pnpm run test:e2e
+### Install dependencies
 
-# test coverage
-$ pnpm run test:cov
+```
+pnpm install
 ```
 
-## Deployment
+### Start Docker Compose Services
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+```
+pnpm docker:up
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Run DB migration
 
-## Resources
+```
+pnpm migrate:run
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Starts local Postgres container on port 5432
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Seed database (optional)
 
-## Support
+```
+pnpm seed:tasks
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Run BE (development)
 
-## Stay in touch
+```
+pnpm start:dev
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+API runs at http://localhost:3000
 
-## License
+---
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 🗃️ Database & Migrations
+
+### Generate a new migration
+
+```
+pnpm migrate:generate
+```
+
+### Run migrations
+
+```
+pnpm migrate:run
+```
+
+### Revert last migration
+
+```
+pnpm migrate:revert
+```
+
+### Reset database (CAUTION: dev only!)
+
+```
+pnpm docker:restart
+pnpm migrate:run
+```
+
+---
+
+## 📡 Endpoints
+
+| **Method** | **Endpoint**     | **Description**                     |
+| ---------- | ---------------- | ----------------------------------- |
+| GET        | `/api/tasks`     | Get all tasks (optionally filtered) |
+| POST       | `/api/tasks`     | Create a new task                   |
+| PATCH      | `/api/tasks`     | Bulk patch update                   |
+| DELETE     | `/api/tasks`     | Delete all tasks                    |
+| GET        | `/api/tasks/:id` | Get a specific task                 |
+| PATCH      | `/api/tasks/:id` | Partial task update                 |
+| DELETE     | `/api/tasks/:id` | Delete a task                       |
+
+---
+
+## 📜 Scripts
+
+| **Script**              | **Description**                                          |
+| ----------------------- | -------------------------------------------------------- |
+| `pnpm install`          | Install project dependencies                             |
+| `pnpm build`            | Compile TypeScript to `dist/` directory                  |
+| `pnpm start`            | Start app in production mode                             |
+| `pnpm start:dev`        | Start dev server with hot reload                         |
+| `pnpm start:debug`      | Start app in debug mode with file watching               |
+| `pnpm start:prod`       | Run compiled app from `dist/main.js`                     |
+| `pnpm format`           | Format entire codebase using Prettier                    |
+| `pnpm lint`             | Run ESLint to check for code issues                      |
+| `pnpm test`             | Execute all Jest unit tests                              |
+| `pnpm test:watch`       | Continuously run tests whenever files change             |
+| `pnpm test:cov`         | Run tests and generate coverage reports                  |
+| `pnpm test:debug`       | Run tests in Node inspector debug mode                   |
+| `pnpm test:e2e`         | Run end-to-end tests using Jest E2E configuration        |
+| `pnpm docker:up`        | Start local infrastructure (Postgres) via Docker Compose |
+| `pnpm docker:down`      | Stop and remove all Docker containers and resources      |
+| `pnpm docker:restart`   | Restart Docker Compose services from scratch             |
+| `pnpm db:create`        | Create local development database (`scratch_db`)         |
+| `pnpm db:drop`          | Drop local development database if it exists             |
+| `pnpm migrate:generate` | Generate new TypeORM migration based on entity changes   |
+| `pnpm migrate:run`      | Apply all pending database migrations                    |
+| `pnpm migrate:revert`   | Roll back the most recent migration                      |
+| `pnpm seed:run`         | Run the database seeding scripts                         |
+
+---
+
+## 🚀 Roadmap
+
+These will be added gradually:
+
+- Authentication (JWT)
+- Users module
+- RBAC
+- OpenAPI / Swagger documentation
+- Observability (metrics, logs, tracing)
+- Health checks & readiness endpoints
+- Git hooks
+- CI/CD
+- Production Dockerfile
+- Helm charts / Kubernetes deployment
+- Rate limiting
+- Caching (Redis)
+- Background workers (BullMQ)
+- Integration tests
+
+---
+
+## 📄 License
+
+MIT
