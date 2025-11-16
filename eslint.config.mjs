@@ -27,7 +27,69 @@ export default [
 
   // Custom rules
   {
-    ignores: ['.eslintrc.js', 'eslint.config.mjs'],
+    ignores: [
+      '.eslintrc.js',
+      'eslint.config.mjs',
+
+      // Node modules / package manager
+      'node_modules/',
+      '.pnpm-store/',
+      '.pnp.*',
+
+      // Build / compiled output
+      'dist/',
+      'build/',
+
+      // TypeScript cache / artifacts
+      '*.tsbuildinfo',
+
+      // Coverage
+      'coverage/',
+      '.nyc_output/',
+
+      // Editor
+      '.vscode/',
+      '.idea/',
+      '*.swp',
+      '*.swo',
+
+      // OS
+      '.DS_Store',
+
+      // Logs
+      'logs/',
+      '*.log',
+      'npm-debug.log*',
+      'pnpm-debug.log*',
+      'yarn-debug.log*',
+      'yarn-error.log*',
+
+      // Environments (keep committed .env.dev)
+      '.env',
+      '.env.local',
+      '*.env.local',
+
+      // Compiled JS (lint only TS)
+      '**/*.js',
+      '**/*.map',
+      '**/*.d.ts',
+
+      // Compiled Migrations (lint only TS sources)
+      'src/migrations/**/*.js',
+
+      // Temp
+      '.tmp/',
+      '.temp/',
+
+      // Runtime data
+      'pids',
+      '*.pid',
+      '*.seed',
+      '*.pid.lock',
+
+      // Diagnostic reports
+      'report.*.json',
+    ],
 
     languageOptions: {
       sourceType: 'module',

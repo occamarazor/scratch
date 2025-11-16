@@ -47,7 +47,7 @@ yarn-error.log*
 # Compiled Migrations (format only TS sources)
 src/migrations/**/*.js
 
-# Tests output or temp folders
+# Temp
 .tmp/
 .temp/
 
@@ -57,5 +57,5 @@ pids
 *.seed
 *.pid.lock
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# Diagnostic reports
+report.*.json
