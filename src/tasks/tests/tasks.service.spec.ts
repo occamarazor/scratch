@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-
-import { TasksService } from '../tasks.service';
+import { TasksService } from '@tasks/tasks.service';
 
 // TODO: fix & write proper tests
 describe('TasksService', () => {
