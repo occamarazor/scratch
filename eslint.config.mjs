@@ -7,26 +7,28 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import sonarjs from 'eslint-plugin-sonarjs';
 import preferArrow from 'eslint-plugin-prefer-arrow';
 import noNull from 'eslint-plugin-no-null';
-
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
 const compat = new FlatCompat({});
 
 export default [
   // Base ESLint recommended
   js.configs.recommended,
 
-  // TypeScript ESLint recommended config (parser is auto-configured by plugin)
+  // TS ESLint recommended via compat
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-type-checked',
   ),
 
-  // Prettier integration
+  // Prettier integration (compat handles this)
   prettierRecommended,
 
   // Custom rules
   {
+    // Files / patterns to ignore
     ignores: [
       '.eslintrc.js',
       'eslint.config.mjs',
@@ -91,15 +93,28 @@ export default [
       'report.*.json',
     ],
 
+    // TS parser used to enable project-aware rules
     languageOptions: {
       sourceType: 'module',
+      parser: require.resolve('@typescript-eslint/parser'),
       parserOptions: {
         ecmaVersion: 'latest',
         project: './tsconfig.json',
+        tsconfigRootDir: new URL('.', import.meta.url).pathname,
       },
       globals: {
         ...globals.node,
         ...globals.jest,
+      },
+    },
+
+    // eslint-plugin-import helper: resolves tsconfig paths
+    // (requires eslint-import-resolver-typescript)
+    settings: {
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
       },
     },
 
@@ -111,6 +126,9 @@ export default [
       'no-null': noNull,
       '@typescript-eslint': typescriptPlugin,
     },
+
+    // Report unused eslint-disable directives (helps keep code clean)
+    reportUnusedDisableDirectives: true,
 
     rules: {
       // TypeScript-specific (tune as desired)
@@ -150,5 +168,27 @@ export default [
       // No null (stylistic)
       'no-null/no-null': 'warn',
     },
+
+    // Overrides for tests (faster & avoids type-checked linting on test files)
+    overrides: [
+      {
+        files: ['**/*.spec.ts', '**/*.test.ts', 'test/**'],
+        languageOptions: {
+          globals: {
+            ...globals.jest,
+            ...globals.node,
+          },
+          // For tests we don't need type-aware rules (faster). Remove project to disable type-checking.
+          parserOptions: {
+            ecmaVersion: 'latest',
+            // project: undefined,
+          },
+        },
+        rules: {
+          // Relax rules for tests if necessary
+          '@typescript-eslint/no-floating-promises': 'off',
+        },
+      },
+    ],
   },
 ];
