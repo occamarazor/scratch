@@ -1,9 +1,10 @@
 import 'reflect-metadata';
 
-import configuration from '@config/configuration';
+import { AppConfig } from '@config/config.types';
+import configuration from '@config/config.factory';
 import { DataSource } from 'typeorm';
 
-const cfg = configuration();
+const cfg: AppConfig = configuration();
 
 const AppDataSource = new DataSource({
   type: 'postgres',

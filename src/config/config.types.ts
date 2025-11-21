@@ -1,6 +1,11 @@
 import { Nullable } from '@common/types';
 
-export type NodeEnv = 'development' | 'test' | 'production';
+import { NODE_ENV_DEVELOPMENT, NODE_ENV_PRODUCTION, NODE_ENV_TEST } from './config.constants';
+
+export type NodeEnv =
+  | typeof NODE_ENV_DEVELOPMENT
+  | typeof NODE_ENV_TEST
+  | typeof NODE_ENV_PRODUCTION;
 
 export interface DatabaseConfig {
   host: string;
@@ -11,7 +16,7 @@ export interface DatabaseConfig {
 }
 
 export interface AuthConfig {
-  jwtSecret: Nullable<string>; // Allow bootstrapping without a secret in early dev
+  jwtSecret: Nullable<string>; // TODO: allow bootstrapping without in early dev
   jwtExpiresIn: string;
 }
 
@@ -19,7 +24,7 @@ export interface AppConfig {
   appName: string;
   nodeEnv: NodeEnv;
   port: number;
-  frontendUrl: Nullable<string>; // Useful for CORS
+  frontendUrl: Nullable<string>; // TODO: allow bootstrapping without in early dev
   database: DatabaseConfig;
   auth: AuthConfig;
 }

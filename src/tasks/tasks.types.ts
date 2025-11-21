@@ -1,9 +1,9 @@
 import { Nullable } from '@common/types';
 
 export enum TaskStatus {
-  TODO = 'TODO',
-  IN_PROGRESS = 'IN_PROGRESS',
-  DONE = 'DONE',
+  TODO,
+  IN_PROGRESS,
+  DONE,
 }
 
 export interface Task {

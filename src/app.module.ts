@@ -1,6 +1,9 @@
+import { Nullable } from '@common/types';
+import { NODE_ENV_DEVELOPMENT } from '@config/config.constants';
+import configuration from '@config/config.factory';
 import type { AppConfig, DatabaseConfig } from '@config/config.types';
-import configuration from '@config/configuration';
-import validationSchema from '@config/validation';
+import { NodeEnv } from '@config/config.types';
+import validationSchema from '@config/config.validation';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
@@ -19,12 +22,12 @@ import { TasksModule } from '@tasks/tasks.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (cfg: ConfigService<AppConfig>): TypeOrmModuleOptions => {
-        const db = cfg.get<DatabaseConfig>('database', { infer: true }) as DatabaseConfig;
+        const db: Nullable<DatabaseConfig> = cfg.get('database', { infer: true });
 
         if (!db) throw new Error('Database configuration not found');
 
-        const nodeEnv = cfg.get<AppConfig['nodeEnv']>('nodeEnv', { infer: true }) ?? 'development';
-        const isDev = nodeEnv === 'development';
+        const nodeEnv: Nullable<NodeEnv> = cfg.get('nodeEnv', { infer: true });
+        const isDev: boolean = nodeEnv === NODE_ENV_DEVELOPMENT;
 
         return {
           type: 'postgres',

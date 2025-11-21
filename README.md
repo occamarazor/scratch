@@ -90,7 +90,7 @@ development tooling. This project is designed for clarity, maintainability, and 
 APP_NAME=Scratch
 NODE_ENV=development
 PORT=3000
-FRONTEND_URL=http://localhost:5173
+FRONTEND_URL=
 
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
