@@ -14,8 +14,8 @@ const config: Config.InitialOptions = {
     '^@config/(.*)$': '<rootDir>/src/config/$1',
     '^@common/(.*)$': '<rootDir>/src/common/$1',
     '^@tasks/(.*)$': '<rootDir>/src/tasks/$1',
-    '^@(.*)$': '<rootDir>/src/$1', // optional catch-all
   },
+  moduleDirectories: ['node_modules', 'src'],
 };
 
 export default config;

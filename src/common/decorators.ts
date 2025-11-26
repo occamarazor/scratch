@@ -1,8 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-import type { AuthUser, Nullable } from './types';
-
-export type RequestWithUser = Request & { user?: AuthUser };
+import type { AuthUser, Nullable, RequestWithUser } from './types';
 
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): Nullable<AuthUser> => {

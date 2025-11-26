@@ -1,5 +1,8 @@
 import type { Nullable } from '@common/types';
 import {
+  AfterInsert,
+  AfterRemove,
+  AfterUpdate,
   Check,
   Column,
   CreateDateColumn,
@@ -46,4 +49,19 @@ export class TaskEntity {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date;
+
+  @AfterInsert()
+  logCreate() {
+    console.log('Task created: ', this.id);
+  }
+
+  @AfterUpdate()
+  logUpdate() {
+    console.log('Task updated: ', this.id);
+  }
+
+  @AfterRemove()
+  logDelete() {
+    console.log('Task deleted: ', this.id);
+  }
 }

@@ -50,9 +50,9 @@ export class TasksController {
 
   @Patch()
   async updateTasks(
-    @Body() body: { ids: number[]; patch: Partial<UpdateTaskDto> },
+    @Body() { ids, patch }: { ids: number[]; patch: Partial<UpdateTaskDto> },
   ): Promise<TasksUpdateResponse> {
-    const affectedTasks: number = await this.tasksService.updateTasks(body.ids, body.patch);
+    const affectedTasks: number = await this.tasksService.updateTasks(ids, patch);
     return { affectedTasks };
   }
 

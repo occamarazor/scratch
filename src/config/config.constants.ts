@@ -19,6 +19,7 @@ export const AppConfigDefaults: AppConfig = {
     user: 'postgres',
     password: 'postgres',
   },
+
   auth: {
     jwtSecret: undefined as Nullable<string>, // TODO: allow bootstrapping without in early dev
     jwtExpiresIn: '1h',

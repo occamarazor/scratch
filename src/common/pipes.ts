@@ -14,7 +14,9 @@ export class ParseNullableIntPipe implements PipeTransform<Nullable<string>, Nul
     }
 
     const parsed = Number(value);
+
     if (Number.isInteger(parsed)) return parsed;
+
     throw new BadRequestException(
       `Validation failed (ownerId must be an integer). Received: ${value}`,
     );

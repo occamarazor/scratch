@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
-import { AppConfig } from '@config/config.types';
 import configuration from '@config/config.factory';
+import { AppConfig } from '@config/config.types';
 import { DataSource } from 'typeorm';
 
 const cfg: AppConfig = configuration();
