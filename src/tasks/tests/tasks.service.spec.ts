@@ -1,8 +1,14 @@
+import type { Nullable } from '@common/types';
 import type { CreateTaskDto } from '@tasks/dto/create-task.dto';
-import type { UpdateTaskDto } from '@tasks/dto/update-task.dto';
+import { UpdateTaskDto } from '@tasks/dto/update-task.dto';
 import { TaskEntity } from '@tasks/entities/task.entity';
 import { TasksService } from '@tasks/tasks.service';
-import { TaskStatus } from '@tasks/tasks.types';
+import type { Task } from '@tasks/tasks.types';
+import {
+  generateCreateTaskDto,
+  generateTaskEntity,
+  resetFactories,
+} from '@tasks/tests/fixtures/tasks.factories';
 import { Repository } from 'typeorm';
 
 // Helper type: keys are repo method names, values are jest.Mock
@@ -20,16 +26,16 @@ type QueryBuilderMock = {
 
 // Emulates the small part of TypeORM’s query builder API used by TasksService.updateTasks
 const createQueryBuilderMock = (): QueryBuilderMock => {
-  const executeMock = jest.fn().mockResolvedValue({ affected: 1 });
-  const whereMock = jest.fn().mockReturnValue({ execute: executeMock });
-  const setMock = jest.fn().mockReturnValue({ where: whereMock });
-  const updateMock = jest.fn().mockReturnValue({ set: setMock });
+  const execute = jest.fn().mockResolvedValue({ affected: 1 });
+  const where = jest.fn().mockReturnValue({ execute });
+  const set = jest.fn().mockReturnValue({ where });
+  const update = jest.fn().mockReturnValue({ set });
 
   return {
-    update: updateMock,
-    set: setMock,
-    where: whereMock,
-    execute: executeMock,
+    update,
+    set,
+    where,
+    execute,
   };
 };
 
@@ -38,6 +44,8 @@ describe('TasksService', () => {
   let mockRepo: MockRepo<TaskEntity>;
 
   beforeEach(() => {
+    resetFactories();
+
     mockRepo = {
       find: jest.fn(),
       create: jest.fn(),
@@ -55,45 +63,50 @@ describe('TasksService', () => {
 
   afterEach(() => jest.resetAllMocks());
 
-  it('createTask: should create & save an entity and return domain object', async () => {
-    const dto: CreateTaskDto = {
-      title: 'Test title',
-      description: 'Test description',
-      status: TaskStatus.TODO,
-      priority: 1,
-      dueAt: undefined,
-    };
+  it('getTasks: should map entities to domain', async () => {
+    const e1: TaskEntity = generateTaskEntity({ id: 1, title: 't1', ownerId: 5 });
+    const e2: TaskEntity = generateTaskEntity({ id: 2, title: 't2', ownerId: 5 });
+    (mockRepo.find as jest.Mock).mockResolvedValue([e1, e2]);
 
-    const createdEntity: Partial<TaskEntity> = {
-      id: 42,
-      title: dto.title,
-      description: dto.description,
-      status: dto.status,
-      priority: dto.priority,
-      dueAt: undefined,
-      ownerId: undefined,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // Repo create & save mock returning new entity
-    (mockRepo.create as jest.Mock).mockReturnValue(createdEntity);
-    (mockRepo.save as jest.Mock).mockResolvedValue(createdEntity);
-
-    const result = await service.createTask(dto);
-    expect(mockRepo.create).toHaveBeenCalledWith(
+    const result: Task[] = await service.getTasks(5);
+    expect(mockRepo.find).toHaveBeenCalledWith(
       expect.objectContaining({
-        ownerId: undefined,
-        title: 'Test title',
-        description: 'Test description',
-        status: 'TODO',
-        priority: 1,
-        dueAt: undefined,
+        where: { ownerId: 5 },
       }),
     );
-    expect(mockRepo.save).toHaveBeenCalledWith(createdEntity);
-    expect(result.id).toBe(42);
-    expect(result.title).toBe('Test title');
+    expect(result).toHaveLength(2);
+    expect(result[0].id).toBe(1);
+    expect(result[0].title).toBe('t1');
+    expect(result[0].ownerId).toBe(5);
+  });
+
+  it('createTask: should create & save entity and return domain object', async () => {
+    const dto: CreateTaskDto = generateCreateTaskDto({ dueAt: '2025-11-20T12:00:00.000Z' });
+
+    const entity: TaskEntity = generateTaskEntity({
+      title: dto.title,
+      description: dto.description,
+      dueAt: new Date(dto.dueAt as string),
+      ownerId: 11,
+    });
+
+    // Repo create & save mock returning new entity
+    (mockRepo.create as jest.Mock).mockReturnValue(entity);
+    (mockRepo.save as jest.Mock).mockResolvedValue(entity);
+
+    const result: Task = await service.createTask(dto, 11);
+
+    expect(mockRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: dto.title,
+        description: dto.description,
+        dueAt: new Date(dto?.dueAt as string),
+        ownerId: 11,
+      }),
+    );
+    expect(result.id).toBe(entity.id);
+    expect(result.dueAt).toBeInstanceOf(Date);
+    expect(result.ownerId).toBe(11);
   });
 
   it('updateTasks: should run bulk update and return affected count', async () => {
@@ -111,25 +124,13 @@ describe('TasksService', () => {
   });
 
   it('getTaskById: returns domain object if found, undefined if not', async () => {
-    const entity: Partial<TaskEntity> = {
-      id: 100,
-      title: 'Test title',
-      description: undefined,
-      status: TaskStatus.TODO,
-      priority: 0,
-      dueAt: undefined,
-      ownerId: undefined,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const entity: TaskEntity = generateTaskEntity({ id: 10 });
+    (mockRepo.findOne as jest.Mock).mockResolvedValueOnce(entity);
+    const found: Nullable<Task> = await service.getTaskById(10);
+    expect(found?.id).toBe(10);
 
-    (mockRepo.findOne as jest.Mock).mockResolvedValue(entity);
-    const foundEntity = await service.getTaskById(100);
-    expect(foundEntity).toBeDefined();
-    expect(foundEntity?.id).toBe(100);
-
-    (mockRepo.findOne as jest.Mock).mockResolvedValue(undefined);
-    const notFoundEntity = await service.getTaskById(99999);
-    expect(notFoundEntity).toBeUndefined();
+    (mockRepo.findOne as jest.Mock).mockResolvedValueOnce(undefined);
+    const notFound: Nullable<Task> = await service.getTaskById(999);
+    expect(notFound).toBeUndefined();
   });
 });
