@@ -1,17 +1,17 @@
 import type { CreateTaskDto } from '@tasks/dto/create-task.dto';
 import type { UpdateTaskDto } from '@tasks/dto/update-task.dto';
 import { TaskEntity } from '@tasks/entities/task.entity';
+import type { Task } from '@tasks/tasks.types';
 import { TaskStatus } from '@tasks/tasks.types';
 
-// Simple incrementing counter for ids in tests
-let nextId = 1000;
+let idCounter = 1000;
 export const resetFactories = () => {
-  nextId = 1000;
+  idCounter = 1000;
 };
 
 export const generateCreateTaskDto = (overrides?: Partial<CreateTaskDto>): CreateTaskDto => ({
-  title: 'Test Task',
-  description: 'Test description',
+  title: `Generated Create DTO: ${idCounter}`,
+  description: 'Generated Create DTO Description',
   status: TaskStatus.TODO,
   priority: 0,
   dueAt: undefined,
@@ -29,18 +29,37 @@ export const generateUpdateTaskDto = (overrides?: Partial<UpdateTaskDto>): Updat
 
 // Return a *real* TaskEntity instance so class-transformer / TypeORM assumptions hold
 export const generateTaskEntity = (overrides?: Partial<TaskEntity>): TaskEntity => {
+  const now = new Date();
+
   const base: Partial<TaskEntity> = {
-    id: nextId++,
-    title: 'Task ' + Math.random().toString(36).slice(2, 8),
-    description: 'desc',
+    id: idCounter++,
+    title: `Generated Task Entity ${Math.floor(Math.random() * 10000)}`,
+    description: 'Generated Task Entity Description',
     status: TaskStatus.TODO,
     priority: 0,
     dueAt: undefined,
     ownerId: undefined,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: now,
+    updatedAt: now,
   };
 
   const obj = Object.assign(new TaskEntity(), { ...base, ...overrides });
   return obj;
+};
+
+export const generateTask = (overrides?: Partial<Task>): Task => {
+  const now = new Date();
+
+  return {
+    id: idCounter++,
+    title: `Generated Task ${Math.floor(Math.random() * 10000)}`,
+    description: 'Generated Task Description',
+    status: TaskStatus.TODO,
+    priority: 0,
+    dueAt: undefined,
+    ownerId: undefined,
+    createdAt: now,
+    updatedAt: now,
+    ...overrides,
+  };
 };

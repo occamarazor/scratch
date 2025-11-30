@@ -21,11 +21,12 @@
     "noImplicitAny": true,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@config/*": ["config/*"],
-      "@common/*": ["common/*"],
-      "@tasks/*": ["tasks/*"]
+      "@config/*": ["src/config/*"],
+      "@common/*": ["src/common/*"],
+      "@tasks/*": ["src/tasks/*"],
+      "@test/*": ["test/*"]
     }
   }
 }

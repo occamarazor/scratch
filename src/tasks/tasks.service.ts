@@ -69,6 +69,8 @@ export class TasksService {
   }
 
   async updateTasks(ids: number[], patch: Partial<UpdateTaskDto>): Promise<number> {
+    if (!Array.isArray(ids) || ids.length === 0) return 0;
+
     // Validate patch using UpdateTaskDto rules
     const dtoInstance: UpdateTaskDto = plainToInstance(UpdateTaskDto, patch);
 
@@ -145,7 +147,7 @@ export class TasksService {
     const { dueAt, ...rest }: UpdateTaskDto = dto;
     const patch: Partial<TaskEntity> = {
       ...(rest as Partial<TaskEntity>),
-      ...(dueAt !== undefined ? { dueAt: new Date(dueAt) } : {}),
+      dueAt: dueAt ? new Date(dueAt) : undefined,
     };
 
     this.tasksRepository.merge(taskEntityUpdated, patch);
