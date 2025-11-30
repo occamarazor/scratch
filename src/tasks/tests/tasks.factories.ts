@@ -18,7 +18,7 @@ export const generateCreateTaskDto = (overrides?: Partial<CreateTaskDto>): Creat
   ...overrides,
 });
 
-export const generateUpdateTaskDto = (overrides?: Partial<UpdateTaskDto>): UpdateTaskDto => ({
+export const generateUpdateTaskDto = (overrides?: UpdateTaskDto): UpdateTaskDto => ({
   title: undefined,
   description: undefined,
   status: undefined,
@@ -63,3 +63,16 @@ export const generateTask = (overrides?: Partial<Task>): Task => {
     ...overrides,
   };
 };
+
+export const generateTasksDomainToResponse = (): jest.Mock =>
+  jest.fn((task: Task) => ({
+    id: task.id,
+    title: task.title,
+    description: task.description,
+    status: task.status,
+    priority: task.priority,
+    ownerId: task.ownerId,
+    dueAt: task.dueAt ? task.dueAt.toISOString() : undefined,
+    createdAt: task.createdAt.toISOString(),
+    updatedAt: task.updatedAt.toISOString(),
+  }));

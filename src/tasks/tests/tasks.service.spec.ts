@@ -13,8 +13,8 @@ import {
   generateUpdateTaskDto,
   resetFactories,
 } from '@tasks/tests/tasks.factories';
-import { createQueryBuilderMock, createRepoMock } from '@test/utils/tests.helpers';
-import { QueryBuilderMock, RepoMock } from '@test/utils/tests.types';
+import { generateQueryBuilderMock, generateRepoMock } from '@test/utils/factories';
+import { QueryBuilderMock, RepoMock } from '@test/utils/types';
 import { Repository } from 'typeorm';
 
 describe('TasksService', () => {
@@ -24,9 +24,9 @@ describe('TasksService', () => {
   beforeEach(() => {
     resetFactories();
 
-    repoMock = createRepoMock();
+    repoMock = generateRepoMock();
 
-    // Deliberate double cast: Partial mock -> Repository<T>
+    // Deliberate double cast for tests: concrete TaskEntity Repository expected
     service = new TasksService(repoMock as unknown as Repository<TaskEntity>);
   });
 
@@ -63,13 +63,13 @@ describe('TasksService', () => {
     const ownerId: number = 11;
     const dueAt: string = '2025-11-20T12:00:00.000Z';
     const dto: CreateTaskDto = generateCreateTaskDto({ dueAt });
-    const entity: TaskEntity = generateTaskEntity({
+    const created: TaskEntity = generateTaskEntity({
       dueAt: new Date(dueAt),
       ownerId,
     });
 
-    (repoMock.create as jest.Mock).mockReturnValue(entity);
-    (repoMock.save as jest.Mock).mockResolvedValue(entity);
+    (repoMock.create as jest.Mock).mockReturnValue(created);
+    (repoMock.save as jest.Mock).mockResolvedValue(created);
 
     const result: Task = await service.createTask(dto, ownerId);
 
@@ -81,15 +81,15 @@ describe('TasksService', () => {
         ownerId,
       }),
     );
-    expect(result.id).toBe(entity.id);
+    expect(result.id).toBe(created.id);
     expect(result.dueAt).toBeInstanceOf(Date);
     expect(result.ownerId).toBe(ownerId);
   });
 
   it('updateTasks: should run bulk update and return affected count', async () => {
     const ids: number[] = [1, 2, 3];
-    const patch: Partial<UpdateTaskDto> = { priority: 2 };
-    const qb: QueryBuilderMock = createQueryBuilderMock();
+    const patch: UpdateTaskDto = { priority: 2 };
+    const qb: QueryBuilderMock = generateQueryBuilderMock();
 
     qb.execute.mockResolvedValue({ affected: ids.length });
 
@@ -104,7 +104,7 @@ describe('TasksService', () => {
 
   it('updateTasks: should be a no-op and return 0 with empty ids', async () => {
     const ids: number[] = [];
-    const patch: Partial<UpdateTaskDto> = { priority: 2 };
+    const patch: UpdateTaskDto = { priority: 2 };
 
     const affected: number = await service.updateTasks(ids, patch);
     expect(affected).toBe(0);
@@ -113,7 +113,7 @@ describe('TasksService', () => {
 
   it('updateTasks: should throw BadRequestException for invalid patch', async () => {
     const ids: number[] = [1, 2];
-    const badPatch = { status: 'INVALID_STATUS' } as unknown as Partial<UpdateTaskDto>;
+    const badPatch = { status: 'INVALID_STATUS' } as unknown as UpdateTaskDto;
 
     await expect(service.updateTasks(ids, badPatch)).rejects.toThrow(BadRequestException);
   });
@@ -126,26 +126,26 @@ describe('TasksService', () => {
 
   it('deleteTasks: should propagate DB errors when .clear rejects', async () => {
     const dbErr = new Error('DB clear failed');
-    (repoMock.clear as jest.Mock).mockRejectedValueOnce(dbErr);
+    (repoMock.clear as jest.Mock).mockRejectedValue(dbErr);
 
     await expect(service.deleteTasks()).rejects.toThrow(dbErr);
     expect(repoMock.clear).toHaveBeenCalled();
   });
 
   it('getTaskById: should return domain object when task found', async () => {
-    const taskId = 10;
-    const entity: TaskEntity = generateTaskEntity({ id: taskId });
+    const taskId: number = 10;
+    const found: TaskEntity = generateTaskEntity({ id: taskId });
 
-    (repoMock.findOne as jest.Mock).mockResolvedValue(entity);
+    (repoMock.findOne as jest.Mock).mockResolvedValue(found);
 
-    const found: Nullable<Task> = await service.getTaskById(taskId);
-    expect(found?.id).toBe(taskId);
+    const result: Nullable<Task> = await service.getTaskById(taskId);
+    expect(result?.id).toBe(taskId);
   });
 
   it('getTaskById: should return undefined when task not found', async () => {
     (repoMock.findOne as jest.Mock).mockResolvedValue(undefined);
-    const notFound: Nullable<Task> = await service.getTaskById(999);
-    expect(notFound).toBeUndefined();
+    const result: Nullable<Task> = await service.getTaskById(999);
+    expect(result).toBeUndefined();
   });
 
   it('updateTaskById: should merge, save and return updated domain object', async () => {
@@ -202,7 +202,7 @@ describe('TasksService', () => {
   it('updateTaskById: should return undefined when task not found', async () => {
     const dto: UpdateTaskDto = generateUpdateTaskDto({ title: 'New title' });
 
-    (repoMock.findOne as jest.Mock).mockResolvedValueOnce(undefined);
+    (repoMock.findOne as jest.Mock).mockResolvedValue(undefined);
 
     const result: Nullable<Task> = await service.updateTaskById(687, dto);
     expect(result).toBeUndefined();
@@ -210,15 +210,15 @@ describe('TasksService', () => {
 
   it('deleteTaskById: should return true when deletion affected 1 row', async () => {
     (repoMock.delete as jest.Mock).mockResolvedValue({ affected: 1 });
-    const taskeDeleted = await service.deleteTaskById(77);
+    const result: boolean = await service.deleteTaskById(77);
     expect(repoMock.delete).toHaveBeenCalledWith(77);
-    expect(taskeDeleted).toBe(true);
+    expect(result).toBe(true);
   });
 
   it('deleteTaskById: should return false when none affected', async () => {
     (repoMock.delete as jest.Mock).mockResolvedValue({ affected: 0 });
-    const taskeDeleted = await service.deleteTaskById(9999);
+    const result: boolean = await service.deleteTaskById(9999);
     expect(repoMock.delete).toHaveBeenCalledWith(9999);
-    expect(taskeDeleted).toBe(false);
+    expect(result).toBe(false);
   });
 });
