@@ -44,13 +44,13 @@ development tooling. This project is designed for clarity, maintainability, and 
 
 ```
 ├── src/
-│   ├── common/                   # Reusable (decorators, pipes, types)
-│   ├── config/                   # App configs, schema validation
+│   ├── common/                   # Reusables (decorators, pipes, types)
+│   ├── config/                   # App configs, schema validation (joi)
 │   ├── migrations/               # TypeORM migrations (source)
 │   ├── tasks/                    # Tasks feature module
 │   │   ├── dto/                  # Request/response DTOs
 │   │   ├── entities/             # TypeORM entity definitions
-│   │   ├── tests/                # Unit tests for this module
+│   │   ├── tests/                # Unit tests (jest) for this module
 │   │   ├── tasks.controller.ts
 │   │   ├── tasks.service.ts
 │   │   ├── tasks.module.ts
@@ -58,13 +58,13 @@ development tooling. This project is designed for clarity, maintainability, and 
 │   ├── app.module.ts             # Root module
 │   ├── data-source.ts            # TypeORM CLI datasource
 │   └── main.ts                   # Application entrypoint
-├── test/                         # E2E tests (Jest + Supertest)
+├── test/                         # Tests (E2E, integration, utility)
 ├── docs/
 │   └── requests/                 # HTTP request examples (REST client)
 ├── scripts/                      # DB seeding or helper scripts
 ├── .vscode/                      # VSCode config (launch, tasks)
 ├── .env.dev                      # Development environment variables
-├── docker-compose.yml            # Local Postgres services
+├── docker-compose.yml            # Local Docker services (Postgres)
 ├── package.json
 ├── tsconfig.json
 └── README.md

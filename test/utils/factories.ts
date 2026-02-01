@@ -24,6 +24,19 @@ export const generateServiceMock = <T extends object>(
 };
 
 /**
+ * Lightweight query builder mock
+ * Matches small API used by TasksService.updateTasks
+ */
+export const generateQueryBuilderMock = (): QueryBuilderMock => {
+  const execute = jest.fn().mockResolvedValue({ affected: 1 });
+  const where = jest.fn().mockReturnValue({ execute });
+  const set = jest.fn().mockReturnValue({ where });
+  const update = jest.fn().mockReturnValue({ set });
+
+  return { update, set, where, execute };
+};
+
+/**
  * Minimal repository mock
  * Returns object matching partial Repository<T>
  * Values are jest.fn() so tests can override behaviors
@@ -39,17 +52,4 @@ export const generateRepoMock = <T extends object>(): RepoMock<T> => {
     merge: jest.fn(),
     createQueryBuilder: jest.fn().mockImplementation(generateQueryBuilderMock),
   };
-};
-
-/**
- * Lightweight query builder mock
- * Matches small API used by TasksService.updateTasks
- */
-export const generateQueryBuilderMock = (): QueryBuilderMock => {
-  const execute = jest.fn().mockResolvedValue({ affected: 1 });
-  const where = jest.fn().mockReturnValue({ execute });
-  const set = jest.fn().mockReturnValue({ where });
-  const update = jest.fn().mockReturnValue({ set });
-
-  return { update, set, where, execute };
 };

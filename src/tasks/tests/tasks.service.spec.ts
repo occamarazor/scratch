@@ -32,14 +32,14 @@ describe('TasksService', () => {
 
   afterEach(() => jest.resetAllMocks());
 
-  it('domainToResponse: should convert dates into ISO strings', () => {
+  it('domainToResponse: should convert domain into response object', () => {
     const task: Task = generateTask({ id: 1 });
     const dto: TaskResponseDto = service.domainToResponse(task);
     expect(typeof dto.createdAt).toBe('string');
     expect(dto.createdAt).toBe(new Date(task.createdAt).toISOString());
   });
 
-  it('getTasks: should map entities to domain', async () => {
+  it('getTasks: should return a list of domain objects on success', async () => {
     const ownerId: number = 5;
     const e1: TaskEntity = generateTaskEntity({ id: 1, title: 'Title 1', ownerId });
     const e2: TaskEntity = generateTaskEntity({ id: 2, title: 'Title 2', ownerId });
@@ -59,7 +59,7 @@ describe('TasksService', () => {
     expect(result[1].ownerId).toBe(ownerId);
   });
 
-  it('createTask: should create & save entity and return domain object', async () => {
+  it('createTask: should create & save entity & return domain object on success', async () => {
     const ownerId: number = 11;
     const dueAt: string = '2025-11-20T12:00:00.000Z';
     const dto: CreateTaskDto = generateCreateTaskDto({ dueAt });
@@ -77,7 +77,7 @@ describe('TasksService', () => {
       expect.objectContaining({
         title: dto.title,
         description: dto.description,
-        dueAt: expect.any(Date) as Date,
+        dueAt: new Date(dto.dueAt as string),
         ownerId,
       }),
     );
@@ -86,7 +86,7 @@ describe('TasksService', () => {
     expect(result.ownerId).toBe(ownerId);
   });
 
-  it('updateTasks: should run bulk update and return affected count', async () => {
+  it('updateTasks: should run bulk update & return affected count on success', async () => {
     const ids: number[] = [1, 2, 3];
     const patch: UpdateTaskDto = { priority: 2 };
     const qb: QueryBuilderMock = generateQueryBuilderMock();
@@ -102,7 +102,7 @@ describe('TasksService', () => {
     expect(affected).toBe(ids.length);
   });
 
-  it('updateTasks: should be a no-op and return 0 with empty ids', async () => {
+  it('updateTasks: should be a no-op & return 0 with empty ids', async () => {
     const ids: number[] = [];
     const patch: UpdateTaskDto = { priority: 2 };
 
@@ -118,13 +118,13 @@ describe('TasksService', () => {
     await expect(service.updateTasks(ids, badPatch)).rejects.toThrow(BadRequestException);
   });
 
-  it('deleteTasks: should clear repository', async () => {
+  it('deleteTasks: should clear repository on success', async () => {
     (repoMock.clear as jest.Mock).mockResolvedValue(undefined);
     await service.deleteTasks();
     expect(repoMock.clear).toHaveBeenCalled();
   });
 
-  it('deleteTasks: should propagate DB errors when .clear rejects', async () => {
+  it('deleteTasks: should propagate DB errors when failed', async () => {
     const dbErr = new Error('DB clear failed');
     (repoMock.clear as jest.Mock).mockRejectedValue(dbErr);
 
@@ -132,7 +132,7 @@ describe('TasksService', () => {
     expect(repoMock.clear).toHaveBeenCalled();
   });
 
-  it('getTaskById: should return domain object when task found', async () => {
+  it('getTaskById: should return domain object on success', async () => {
     const taskId: number = 10;
     const found: TaskEntity = generateTaskEntity({ id: taskId });
 
@@ -142,7 +142,7 @@ describe('TasksService', () => {
     expect(result?.id).toBe(taskId);
   });
 
-  it('getTaskById: should return undefined when task not found', async () => {
+  it('getTaskById: should return undefined when not found', async () => {
     (repoMock.findOne as jest.Mock).mockResolvedValue(undefined);
     const result: Nullable<Task> = await service.getTaskById(999);
     expect(result).toBeUndefined();
@@ -183,7 +183,7 @@ describe('TasksService', () => {
     );
 
     expect(repoMock.merge).toHaveBeenCalledWith(
-      expect.any(Object),
+      found,
       expect.objectContaining({
         title: dto.title,
         priority: dto.priority,
@@ -197,9 +197,10 @@ describe('TasksService', () => {
     expect(result?.title).toBe(dto.title);
     expect(result?.priority).toBe(dto.priority);
     expect(result?.dueAt).toBeInstanceOf(Date);
+    expect(result?.dueAt).toStrictEqual(new Date(dto.dueAt as string));
   });
 
-  it('updateTaskById: should return undefined when task not found', async () => {
+  it('updateTaskById: should return undefined when not found', async () => {
     const dto: UpdateTaskDto = generateUpdateTaskDto({ title: 'New title' });
 
     (repoMock.findOne as jest.Mock).mockResolvedValue(undefined);
@@ -208,14 +209,14 @@ describe('TasksService', () => {
     expect(result).toBeUndefined();
   });
 
-  it('deleteTaskById: should return true when deletion affected 1 row', async () => {
+  it('deleteTaskById: should return true on success', async () => {
     (repoMock.delete as jest.Mock).mockResolvedValue({ affected: 1 });
     const result: boolean = await service.deleteTaskById(77);
     expect(repoMock.delete).toHaveBeenCalledWith(77);
     expect(result).toBe(true);
   });
 
-  it('deleteTaskById: should return false when none affected', async () => {
+  it('deleteTaskById: should return false when not found', async () => {
     (repoMock.delete as jest.Mock).mockResolvedValue({ affected: 0 });
     const result: boolean = await service.deleteTaskById(9999);
     expect(repoMock.delete).toHaveBeenCalledWith(9999);
