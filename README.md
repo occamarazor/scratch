@@ -12,6 +12,7 @@ This repository is intentionally architecture-centric. Decisions are explicit, d
 - Maintain a realistic, production-oriented project layout
 
 ## Scope (Phase 1)
+
 ### In scope
 - Tasks CRUD API
 - DTO validation and error handling
@@ -95,3 +96,10 @@ API will be available at http://localhost:3000.
 | GET        | `/api/tasks/:id` | Get task by id                      |
 | PATCH      | `/api/tasks/:id` | Update task                         |
 | DELETE     | `/api/tasks/:id` | Delete task                         |
+
+## Documentation
+- docs/architecture.md — system design and trade-offs
+- docs/roadmap.md — phased evolution plan
+- docs/adr/ — architectural decision records
+- docs/scripts.md — pnpm scripts reference
+- docs/requests/*.http — example API calls
