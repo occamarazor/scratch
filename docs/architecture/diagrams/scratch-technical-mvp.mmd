@@ -1,0 +1,46 @@
+---
+config:
+  theme: redux-dark
+  look: neo
+  layout: dagre
+---
+flowchart TB
+    Client["REST Client<br>(.http / curl / Postman)"]
+    Config["Config Module<br>Env + Joi Validation"]
+    DevTools["DX Tooling<br>pnpm scripts, VSCode tasks, tests"]
+    App["NestJS HTTP Application"]
+    Controllers["TasksController<br>DTOs + ValidationPipe"]
+    Services["TasksService<br>Domain Logic"]
+    DB["Postgres<br>Tasks Table"]
+    Migrations["TypeORM Migrations<br>Schema Source of Truth"]
+    Docker["Docker Compose<br>(Postgres only)"]
+
+    Client --> App
+    App --> Controllers
+    Controllers --> Services
+    Services --> DB
+    Migrations --> DB
+    Config --> App
+    Docker --> DB
+    DevTools --> App
+
+    Config@{ shape: stadium }
+    DevTools@{ shape: stadium }
+    App@{ shape: trap-b }
+    Controllers@{ shape: trap-b }
+    Services@{ shape: rounded }
+    DB@{ shape: cyl }
+    Migrations@{ shape: cyl }
+    Docker@{ shape: stadium }
+
+    classDef clients fill:#ffe6e6,stroke:#d0021b,color:#424242;
+    classDef app fill:#ffeacc,stroke:#ff6d00,color:#424242
+    classDef domain fill:#fff2cc,stroke:#f5a623,color:#424242
+    classDef persistence fill:#e6f7e6,stroke:#7ed321,color:#424242;
+    classDef infra fill:#e6f0ff,stroke:#4a90e2,color:#424242;
+
+    class Client clients
+    class App,Controllers app
+    class Services domain
+    class DB,Migrations persistence
+    class Config,DevTools,Docker infra

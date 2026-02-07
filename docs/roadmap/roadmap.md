@@ -67,8 +67,9 @@ This phase intentionally excludes UI, auth, jobs, and infra complexity.
 - README.md (authoritative project scope)
 - roadmap.md (this file)
 - architecture.md (design & trade-offs)
+- architecture diagrams (code & visual)
 - ADRs (key decisions only)
-- scripts.md (complete list of pnpm scripts available)
+- scripts.md (complete pnpm scripts reference)
 
 ## Out of Scope (Explicit)
 
@@ -238,4 +239,5 @@ Evolve toward a real SaaS backend once complexity is justified.
 # 🧭 Final Note
 
 This roadmap is not a checklist. It is a learning-driven evolution plan.
+
 Phases may overlap slightly, but scope creep inside a phase is considered a failure. Each phase should end with a system that is coherent, explainable, and defensible from an architectural standpoint.

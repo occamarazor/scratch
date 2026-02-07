@@ -37,12 +37,22 @@ This repository is intentionally architecture-centric. Decisions are explicit, d
 │ ├── data-source.ts              # TypeORM CLI datasource
 │ └── main.ts                     # Application entrypoint
 ├── docs/
-│ ├── architecture.md             # System design & trade-offs
-│ ├── roadmap.md                  # Phased evolution plan
-│ ├── scripts.md                  # pnpm scripts reference
-│ ├── adr/                        # Architectural Decision Records
-│ └── requests/                   # HTTP request examples (REST client)
-├── scripts/                      # DB seeding or helper scripts
+│ ├── architecture/               # System architecture artifacts
+│ │ ├── architecture.md           # System design & trade-offs
+│ │ ├── diagrams/                 # Architecture diagrams
+│ │ │ ├── scratch-executive.mmd
+│ │ │ ├── scratch-executive.png
+│ │ │ ├── scratch-technical-mvp.mmd
+│ │ │ ├── scratch-technical-mvp.png
+│ │ │ ├── scratch-technical-future.mmd
+│ │ │ └── scratch-technical-future.png
+│ │ └── adr/                      # Architectural Decision Records
+│ │   └── *.md
+│ ├── roadmap/                    # Product evolution & milestones
+│ │ └── roadmap.md
+│ ├── requests/                   # HTTP request examples
+│ └── scripts.md                  # pnpm scripts reference
+├── scripts/                      # Executable helper scripts (DB seed, etc.)
 ├── test/                         # E2E / integration tests
 ├── docker-compose.yml            # Local Docker services (Postgres)
 ├── .env.dev                      # Development environment variables
@@ -98,8 +108,10 @@ API will be available at http://localhost:3000.
 | DELETE     | `/api/tasks/:id` | Delete task                         |
 
 ## Documentation
-- docs/architecture.md — system design and trade-offs
-- docs/roadmap.md — phased evolution plan
-- docs/adr/ — architectural decision records
-- docs/scripts.md — pnpm scripts reference
+- docs/roadmap/roadmap.md — phased product evolution plan
+- docs/architecture/architecture.md — core system design and trade-offs
+- docs/architecture/diagrams/*.png — visual architecture diagrams
+- docs/architecture/diagrams/*.mmd — architecture diagrams code
+- docs/architecture/adr/*.md — architectural decision records
 - docs/requests/*.http — example API calls
+- docs/scripts.md — complete pnpm scripts reference

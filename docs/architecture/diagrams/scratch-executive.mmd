@@ -1,0 +1,32 @@
+---
+config:
+  theme: redux-dark
+  look: neo
+  layout: dagre
+---
+flowchart LR
+    Tasks["Task Management<br>(CRUD, Status, Priority, Due Dates)"]
+    Users["User Accounts<br>(Future)"]
+    Notifications["Notifications & Reminders<br>(Future)"]
+    Gestures["Optional Client Interactions<br>(Demo Only)"]
+    Reports["Reporting & Insights<br>(Future)"]
+    Saas["SaaS Multi-Tenancy<br>(Future)"]
+
+    Users -.-> Tasks
+    Tasks -.-> Notifications
+    Tasks -.-> Gestures
+    Reports -.-> Tasks
+    Saas -.-> Users & Tasks & Notifications
+
+    Tasks@{ shape: rounded }
+    Users@{ shape: rounded }
+    Notifications@{ shape: rounded }
+    Gestures@{ shape: rounded }
+    Reports@{ shape: rounded }
+    Saas@{ shape: rounded }
+
+    classDef domain fill:#fff2cc,stroke:#f5a623,color:#424242
+    classDef future fill:#e6e6e6,stroke:#9b9b9b,color:#424242,stroke-dasharray: 5 5
+    
+    class Tasks domain
+    class Users,Notifications,Gestures,Reports,Saas future
