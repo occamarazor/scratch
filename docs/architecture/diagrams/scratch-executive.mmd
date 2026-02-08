@@ -1,23 +1,25 @@
----
-config:
-  theme: redux-dark
-  look: neo
-  layout: dagre
----
+%% =========================
+%% Executive View — Capabilities (Temporal)
+%% =========================
 flowchart LR
-    Tasks["Task Management<br>(CRUD, Status, Priority, Due Dates)"]
+    Clients["Clients"]
+
+    Tasks["Task Management"]
     Users["User Accounts<br>(Future)"]
-    Notifications["Notifications & Reminders<br>(Future)"]
+    Notifications["Notifications<br>(Future)"]
     Gestures["Optional Client Interactions<br>(Demo Only)"]
     Reports["Reporting & Insights<br>(Future)"]
     Saas["SaaS Multi-Tenancy<br>(Future)"]
 
+    Clients --> Tasks
     Users -.-> Tasks
     Tasks -.-> Notifications
     Tasks -.-> Gestures
     Reports -.-> Tasks
     Saas -.-> Users & Tasks & Notifications
 
+    %% Shapes
+    Clients@{ shape: rect }
     Tasks@{ shape: rounded }
     Users@{ shape: rounded }
     Notifications@{ shape: rounded }
@@ -25,8 +27,12 @@ flowchart LR
     Reports@{ shape: rounded }
     Saas@{ shape: rounded }
 
-    classDef domain fill:#fff2cc,stroke:#f5a623,color:#424242
-    classDef future fill:#e6e6e6,stroke:#9b9b9b,color:#424242,stroke-dasharray: 5 5
-    
-    class Tasks domain
+    %% Classes
+    class Clients clients
+    class Tasks app
     class Users,Notifications,Gestures,Reports,Saas future
+
+    %% Palette (Authoritative)
+    classDef clients fill:#ffe6e6,stroke:#d0021b,color:#424242;
+    classDef app fill:#ffeacc,stroke:#ff6d00,color:#424242;
+    classDef future fill:#e6e6e6,stroke:#9b9b9b,color:#424242,stroke-dasharray: 5 5;

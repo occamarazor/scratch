@@ -1,47 +1,101 @@
----
-config:
-  look: neo
-  theme: redux-dark
-  layout: dagre
----
+%% =========================
+%% Future Evolution View — Selective Service Extraction (High‑Load, Educational)
+%% =========================
 flowchart TB
-    Web["Web / Client Apps"]
-    Gateway["HTTP Gateway"]
-    Monolith["Modular Monolith<br>(NestJS)"]
+    Clients["Web / Client Apps"]
 
-    Tasks["Tasks Module"]
-    Users["Users / Auth Module"]
-    Notifications["Notifications Module"]
-    Jobs["Background Jobs"]
+    LB["Edge Load Balancer"]
+    Ingress["HTTP Ingress"]
+    TenantEdge["Tenant Resolution @ Edge"]
 
-    SQL["Primary SQL Store<br>(Postgres)"]
-    Cache["Cache / Queues<br>(Redis)"]
-    Search["Search Layer<br>(TBD)"]
-    Observability["Logs / Metrics / Health<br>(TBD)"]
-    Analytics["Analytics / Warehouse<br>(Event-driven)"]
+    Monolith["Modular Monolith<br>(Core Domains)"]
 
-    Web --> Gateway --> Monolith
-    Monolith --> Tasks & Users & Notifications & Jobs
-    Tasks --> SQL
-    Users --> SQL
-    Notifications --> SQL & Cache
-    Jobs --> Cache
-    Monolith --> Observability
+    Tasks["Tasks Domain"]
+    Users["Users / Identity Domain"]
+    Billing["Billing / Tenancy Domain"]
+
+    %% Optional extracted services (educational)
+    subgraph Optional[" "]
+        NotificationsSvc["Notifications Service"]
+        WorkersSvc["Worker / Jobs Service"]
+        footer["Optional Extracted Services (Educational / Scale Isolation)"]:::future
+    end
+
+    style footer fill:none,stroke:none
+
+    %% Persistence
+    SQLPrimary[("Primary SQL<br>(Write)")]
+    SQLReplica[("Read Replica")]
+    Queue[("Queues / Streams")]
+    Search[("Search Index")]
+    Analytics[("Analytics / Warehouse")]
+
+    %% Cross‑cutting
+    Observability["Observability Stack"]
+    Security["Auth / Policy Enforcement"]
+
+    %% Request flow
+    Clients --> LB --> Ingress --> TenantEdge --> Monolith
+
+    %% Monolith internals
+    Monolith --> Tasks & Users & Billing
+    Tasks --> SQLPrimary
+    Users --> SQLPrimary
+    Billing --> SQLPrimary
+
+    %% Read scaling
+    Tasks -.-> SQLReplica
+
+    %% Async integration boundary
+    Monolith --> Queue
+    Queue --> NotificationsSvc
+    Queue --> WorkersSvc
+
+    NotificationsSvc --> SQLPrimary
+
+    %% Optional integrations
     Monolith -.-> Search
     Monolith -.-> Analytics
+    Monolith --> Observability
+    Ingress --> Security
 
-    Monolith@{ shape: trap-b }
-    Gateway@{ shape: stadium }
-    Tasks@{ shape: rounded }
-    Users@{ shape: rounded }
-    Notifications@{ shape: rounded }
-    Jobs@{ shape: h-cyl }
-    SQL@{ shape: cyl }
-    Cache@{ shape: cyl }
+    %% Shapes
+    Clients@{ shape: rect }
+    LB@{ shape: stadium }
+    Ingress@{ shape: stadium }
+    TenantEdge@{ shape: hex }
+    Monolith@{ shape: rounded }
+
+    Tasks@{ shape: trap-b }
+    Users@{ shape: trap-b }
+    Billing@{ shape: trap-b }
+
+    NotificationsSvc@{ shape: rounded }
+    WorkersSvc@{ shape: rounded }
+
+    SQLPrimary@{ shape: cyl }
+    SQLReplica@{ shape: cyl }
     Search@{ shape: cyl }
-    Observability@{ shape: lean-r }
-    Analytics@{ shape: lean-r }
+    Analytics@{ shape: cyl }
+    Queue@{ shape: h-cyl }
 
+    Observability@{ shape: lean-r }
+    Security@{ shape: hex }
+
+    %% Classes
+    class Clients clients
+    class LB,Ingress infra
+    class TenantEdge,Security sec
+    class Monolith app
+
+    class Tasks,Users,Billing domain
+    class NotificationsSvc,WorkersSvc app
+
+    class SQLPrimary,SQLReplica,Search,Analytics,Queue persistence
+    class Observability observability
+    class Optional future
+
+    %% Palette (Authoritative)
     classDef clients fill:#ffe6e6,stroke:#d0021b,color:#424242;
     classDef app fill:#ffeacc,stroke:#ff6d00,color:#424242;
     classDef domain fill:#fff2cc,stroke:#f5a623,color:#424242;
@@ -49,11 +103,4 @@ flowchart TB
     classDef infra fill:#e6f0ff,stroke:#4a90e2,color:#424242;
     classDef sec fill:#ccd9ff,stroke:#003399,color:#424242;
     classDef observability fill:#f9e6ff,stroke:#9013fe,color:#424242;
-    classDef future fill:#e6e6e6,stroke:#9b9b9b,color:#424242,stroke-dasharray: 5 5
-
-    class Web clients
-    class Monolith app
-    class Tasks,Users,Notifications domain
-    class SQL persistence
-    class Gateway,Jobs,Cache,Search,Analytics,Observability future
-
+    classDef future fill:#e6e6e6,stroke:#9b9b9b,color:#424242,stroke-dasharray: 5 5;

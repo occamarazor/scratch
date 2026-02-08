@@ -1,46 +1,53 @@
----
-config:
-  theme: redux-dark
-  look: neo
-  layout: dagre
----
+%% =========================
+%% MVP Technical View — Phase 1
+%% =========================
 flowchart TB
-    Client["REST Client<br>(.http / curl / Postman)"]
-    Config["Config Module<br>Env + Joi Validation"]
-    DevTools["DX Tooling<br>pnpm scripts, VSCode tasks, tests"]
-    App["NestJS HTTP Application"]
-    Controllers["TasksController<br>DTOs + ValidationPipe"]
-    Services["TasksService<br>Domain Logic"]
-    DB["Postgres<br>Tasks Table"]
-    Migrations["TypeORM Migrations<br>Schema Source of Truth"]
-    Docker["Docker Compose<br>(Postgres only)"]
+    Client["REST Client"]
 
-    Client --> App
-    App --> Controllers
-    Controllers --> Services
-    Services --> DB
+    subgraph Runtime["NestJS App (Runtime)"]
+        App["Application Bootstrap"]
+        Controllers["Controllers<br>(DTOs + Validation)"]
+        Domain["Tasks Domain"]
+        Config["Config Module<br>(Typed + Validation)"]
+
+        Controllers --> Domain
+        Config --> App
+        App --> Controllers
+    end
+
+    DB[("Postgres")]
+    Migrations[("TypeORM<br>Migrations")]
+
+    DevTools["DX Tooling<br>(pnpm, VSCode, tests)"]
+    Docker["Docker Compose"]
+
+    Client --> Controllers
+    Domain --> DB
     Migrations --> DB
-    Config --> App
     Docker --> DB
-    DevTools --> App
+    DevTools -.-> App
 
-    Config@{ shape: stadium }
-    DevTools@{ shape: stadium }
-    App@{ shape: trap-b }
-    Controllers@{ shape: trap-b }
-    Services@{ shape: rounded }
+    %% Shapes
+    Client@{ shape: rect }
+    App@{ shape: rounded }
+    Controllers@{ shape: rounded }
+    Domain@{ shape: trap-b }
+    Config@{ shape: rounded }
     DB@{ shape: cyl }
     Migrations@{ shape: cyl }
+    DevTools@{ shape: stadium }
     Docker@{ shape: stadium }
 
+    %% Classes
+    class Client clients
+    class App,Controllers,Config app
+    class Domain domain
+    class DB,Migrations persistence
+    class DevTools,Docker infra
+
+    %% Palette (Authoritative)
     classDef clients fill:#ffe6e6,stroke:#d0021b,color:#424242;
-    classDef app fill:#ffeacc,stroke:#ff6d00,color:#424242
-    classDef domain fill:#fff2cc,stroke:#f5a623,color:#424242
+    classDef app fill:#ffeacc,stroke:#ff6d00,color:#424242;
+    classDef domain fill:#fff2cc,stroke:#f5a623,color:#424242;
     classDef persistence fill:#e6f7e6,stroke:#7ed321,color:#424242;
     classDef infra fill:#e6f0ff,stroke:#4a90e2,color:#424242;
-
-    class Client clients
-    class App,Controllers app
-    class Services domain
-    class DB,Migrations persistence
-    class Config,DevTools,Docker infra
