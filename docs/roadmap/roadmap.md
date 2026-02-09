@@ -16,6 +16,7 @@ These apply to every phase:
 - README, roadmap, and architecture docs stay in sync
 - Prefer incremental refactors over rewrites
 - Monolith-first unless scale forces extraction
+- Future-facing diagrams may exceed current enforcement but must never contradict implemented constraints
 
 
 # 🟧 Phase 1 — Backend Core (MVP Baseline)
@@ -147,7 +148,7 @@ Introduce authentication, authorization, and clearer module boundaries inside th
 
 ---
 
-# 🟨 Phase 4 — Background Jobs & Notifications
+# 🟨 Phase 4 — Async Processing & Side Effects
 
 ## Goal
 Introduce asynchronous processing while keeping deployment simple.
@@ -165,6 +166,9 @@ Introduce asynchronous processing while keeping deployment simple.
 - NotificationEntity
 - Example jobs: reminders, scheduled updates
 - Mock email / notification delivery
+- Clear separation between synchronous domain logic and async side effects
+- Worker pool shown as a separate execution unit
+- Jobs treated as flowing state, not persistence
 
 ## Acceptance Criteria
 
@@ -173,7 +177,7 @@ Introduce asynchronous processing while keeping deployment simple.
 
 ---
 
-# 🟪 Phase 5 — Observability & Operational Readiness
+# 🟪 Phase 5 — Observability, Analytics & Ops Readiness
 
 ## Goal
 Prepare the system for real production usage and troubleshooting.
@@ -191,6 +195,9 @@ Prepare the system for real production usage and troubleshooting.
 - Prometheus-compatible metrics
 - CI: lint, type-check, test, build
 - Production Dockerfile
+- Metrics, logs, and traces (read-only)
+- Analytics/event pipeline
+- No feedback loop into domain behavior
 
 ## Acceptance Criteria
 
@@ -217,7 +224,9 @@ This phase exists for demonstration only. The backend remains the product.
 # 🟦 Phase 7 — SaaS Foundations & Scale
 
 ## Goal
-Evolve toward a real SaaS backend once complexity is justified.
+Introduce explicit multi-tenant boundaries while keeping enforcement intentionally minimal and educational.
+
+The goal is to demonstrate **where tenancy lives in the architecture**, not to deliver a complete billing or compliance system.
 
 ## Scope
 

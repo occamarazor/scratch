@@ -20,10 +20,13 @@ This repository is intentionally architecture-centric. Decisions are explicit, d
 - Dockerized local development
 - Test foundations
 
-### Out of scope (for now)
-- UI and client apps
-- Microservices or distributed systems
-- Heavy infrastructure (queues, observability stacks)
+### Out of scope (for MVP enforcement)
+- End-user UI
+- Billing or quotas
+- Distributed microservices
+- Production-grade observability stacks
+
+Note: Infrastructure, queues, caching, and observability are introduced **progressively and demonstratively** to support architectural learning.
 
 ## Project Structure
 
@@ -112,6 +115,7 @@ API will be available at http://localhost:3000.
 - docs/architecture/architecture.md — core system design and trade-offs
 - docs/architecture/diagrams/*.png — visual architecture diagrams
 - docs/architecture/diagrams/*.mmd — architecture diagrams code
+- scratch-technical-future.mmd represents a **defensible evolution path**, not an immediately implemented system
 - docs/architecture/adr/*.md — architectural decision records
 - docs/requests/*.http — example API calls
 - docs/scripts.md — complete pnpm scripts reference
