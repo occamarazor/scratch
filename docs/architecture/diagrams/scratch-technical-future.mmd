@@ -1,106 +1,262 @@
 %% =========================
-%% Future Evolution View — Selective Service Extraction (High‑Load, Educational)
+%% Future Technical Architecture (Selective Microservices, Minimal High-Load)
 %% =========================
+
+%% =========================================================
+%% CONSTRAINTS (EXPLICIT, BY DESIGN)
+%% =========================================================
+%% - Single Edge Load Balancer
+%% - Single HTTP Ingress (no service mesh)
+%% - Single Postgres primary + one read replica
+%% - No sharding
+%% - No distributed transactions
+%% - Selective service extraction only
 flowchart TB
-    Clients["Web / Client Apps"]
 
-    LB["Edge Load Balancer"]
-    Ingress["HTTP Ingress"]
-    TenantEdge["Tenant Resolution @ Edge"]
+%% =========================================================
+%% CLIENTS / ENTRY
+%% =========================================================
 
-    Monolith["Modular Monolith<br>(Core Domains)"]
+Client["Web / API Clients"]
+Client:::clients
 
-    Tasks["Tasks Domain"]
-    Users["Users / Identity Domain"]
-    Billing["Billing / Tenancy Domain"]
+%% =========================================================
+%% EDGE / TRAFFIC MANAGEMENT
+%% =========================================================
 
-    %% Optional extracted services (educational)
-    subgraph Optional[" "]
-        NotificationsSvc["Notifications Service"]
-        WorkersSvc["Worker / Jobs Service"]
-        footer["Optional Extracted Services (Educational / Scale Isolation)"]:::future
-    end
+EdgeLB["Edge Load Balancer"]
+Ingress["HTTP Ingress"]
 
-    style footer fill:none,stroke:none
+EdgeLB@{ shape: stadium }
+Ingress@{ shape: stadium }
 
-    %% Persistence
-    SQLPrimary[("Primary SQL<br>(Write)")]
-    SQLReplica[("Read Replica")]
-    Queue[("Queues / Streams")]
-    Search[("Search Index")]
-    Analytics[("Analytics / Warehouse")]
+EdgeLB:::infra
+Ingress:::infra
 
-    %% Cross‑cutting
-    Observability["Observability Stack"]
-    Security["Auth / Policy Enforcement"]
+Client --> EdgeLB --> Ingress
 
-    %% Request flow
-    Clients --> LB --> Ingress --> TenantEdge --> Monolith
+%% =========================================================
+%% SECURITY / PLATFORM POLICY
+%% =========================================================
 
-    %% Monolith internals
-    Monolith --> Tasks & Users & Billing
-    Tasks --> SQLPrimary
-    Users --> SQLPrimary
-    Billing --> SQLPrimary
+RateLimit["Rate Limiting"]
+JWT["JWT Validation"]
 
-    %% Read scaling
-    Tasks -.-> SQLReplica
+RateLimit@{ shape: hex }
+JWT@{ shape: hex }
 
-    %% Async integration boundary
-    Monolith --> Queue
-    Queue --> NotificationsSvc
-    Queue --> WorkersSvc
+RateLimit:::sec
+JWT:::sec
 
-    NotificationsSvc --> SQLPrimary
+Ingress --> RateLimit --> JWT
 
-    %% Optional integrations
-    Monolith -.-> Search
-    Monolith -.-> Analytics
-    Monolith --> Observability
-    Ingress --> Security
+%% =========================================================
+%% TENANT RESOLUTION (EDGE-CONCERN)
+%% =========================================================
 
-    %% Shapes
-    Clients@{ shape: rect }
-    LB@{ shape: stadium }
-    Ingress@{ shape: stadium }
-    TenantEdge@{ shape: hex }
-    Monolith@{ shape: rounded }
+TenantResolver["Tenant Identity Resolution"]
+TenantResolver@{ shape: rounded }
+TenantResolver:::app
 
-    Tasks@{ shape: trap-b }
-    Users@{ shape: trap-b }
-    Billing@{ shape: trap-b }
+JWT --> TenantResolver
 
-    NotificationsSvc@{ shape: rounded }
-    WorkersSvc@{ shape: rounded }
+%% =========================================================
+%% REDIS (SHARED INFRA, MULTI-ROLE)
+%% =========================================================
 
-    SQLPrimary@{ shape: cyl }
-    SQLReplica@{ shape: cyl }
-    Search@{ shape: cyl }
-    Analytics@{ shape: cyl }
-    Queue@{ shape: h-cyl }
+RedisInfra["Redis (Shared)"]
+RedisInfra@{ shape: stadium }
+RedisInfra:::infra
 
-    Observability@{ shape: lean-r }
-    Security@{ shape: hex }
+RedisCache["Cache<br>(HTTP / Domain / Tenant)"]
+RedisCache@{ shape: h-cyl }
+RedisCache:::persistence
 
-    %% Classes
-    class Clients clients
-    class LB,Ingress infra
-    class TenantEdge,Security sec
-    class Monolith app
+RedisQueues["Queues (Jobs / Streams)"]
+RedisQueues@{ shape: h-cyl }
+RedisQueues:::persistence
 
-    class Tasks,Users,Billing domain
-    class NotificationsSvc,WorkersSvc app
+RedisRate["Rate Limits / Sessions"]
+RedisRate@{ shape: h-cyl }
+RedisRate:::persistence
 
-    class SQLPrimary,SQLReplica,Search,Analytics,Queue persistence
-    class Observability observability
-    class Optional future
+RedisInfra --- RedisCache
+RedisInfra --- RedisQueues
+RedisInfra --- RedisRate
 
-    %% Palette (Authoritative)
-    classDef clients fill:#ffe6e6,stroke:#d0021b,color:#424242;
-    classDef app fill:#ffeacc,stroke:#ff6d00,color:#424242;
-    classDef domain fill:#fff2cc,stroke:#f5a623,color:#424242;
-    classDef persistence fill:#e6f7e6,stroke:#7ed321,color:#424242;
-    classDef infra fill:#e6f0ff,stroke:#4a90e2,color:#424242;
-    classDef sec fill:#ccd9ff,stroke:#003399,color:#424242;
-    classDef observability fill:#f9e6ff,stroke:#9013fe,color:#424242;
-    classDef future fill:#e6e6e6,stroke:#9b9b9b,color:#424242,stroke-dasharray: 5 5;
+RateLimit --> RedisRate
+TenantResolver --> RedisCache
+
+%% =========================================================
+%% APPLICATION BOUNDARY – MODULAR MONOLITH
+%% =========================================================
+
+subgraph Monolith["Scratch API (Modular Monolith)"]
+direction TB
+
+  AppLayer["Application Layer<br>(Controllers / Use-cases)"]
+  AppLayer@{ shape: rounded }
+  AppLayer:::app
+
+  %% -------------------------
+  %% DOMAIN MODULES (IN-PROCESS)
+  %% -------------------------
+
+  TasksDomain["Tasks Domain"]
+  TasksDomain@{ shape: trap-b }
+  TasksDomain:::domain
+
+  UsersDomain["Users Domain"]
+  UsersDomain@{ shape: trap-b }
+  UsersDomain:::domain
+
+  TenancyDomain["Tenancy Domain"]
+  TenancyDomain@{ shape: trap-b }
+  TenancyDomain:::domain
+
+  AuditDomain["Audit Domain"]
+  AuditDomain@{ shape: trap-b }
+  AuditDomain:::domain
+
+  AppLayer --> TasksDomain
+  AppLayer --> UsersDomain
+  AppLayer --> TenancyDomain
+  AppLayer --> AuditDomain
+end
+
+TenantResolver --> AppLayer
+
+%% =========================================================
+%% TENANCY – METADATA & DB SCOPING
+%% =========================================================
+
+TenantMetaDB["Tenant Metadata DB<br>(public.tenants)"]
+TenantMetaDB@{ shape: cylinder }
+TenantMetaDB:::persistence
+
+TenantSchemaDB["Tenant Schemas<br>(Business Data)"]
+TenantSchemaDB@{ shape: cylinder }
+TenantSchemaDB:::persistence
+
+TenancyDomain --> RedisCache
+TenancyDomain --> TenantMetaDB
+TenancyDomain --> TenantSchemaDB
+
+%% =========================================================
+%% PRIMARY DATABASE (NO SHARDING)
+%% =========================================================
+
+PostgresPrimary["Postgres Primary"]
+PostgresPrimary@{ shape: cylinder }
+PostgresPrimary:::persistence
+
+PostgresReplica["Postgres Read Replica"]
+PostgresReplica@{ shape: cylinder }
+PostgresReplica:::persistence
+
+TasksDomain --> PostgresPrimary
+UsersDomain --> PostgresPrimary
+AuditDomain --> PostgresPrimary
+
+TasksDomain --> PostgresReplica
+UsersDomain --> PostgresReplica
+
+%% =========================================================
+%% SELECTIVELY EXTRACTED SERVICES
+%% =========================================================
+
+%% -------------------------
+%% NOTIFICATIONS SERVICE
+%% -------------------------
+
+subgraph NotificationsSvc["Notifications Service"]
+direction TB
+  NotifApp["App Layer"]
+  NotifApp@{ shape: rounded }
+  NotifApp:::app
+
+  NotifDomain["Notifications Domain"]
+  NotifDomain@{ shape: trap-b }
+  NotifDomain:::domain
+
+  NotifApp --> NotifDomain
+end
+
+AuditDomain --> RedisQueues
+RedisQueues --> NotifApp
+
+%% -------------------------
+%% WORKERS SERVICE (CPU / IO ISOLATION)
+%% -------------------------
+
+subgraph WorkersSvc["Workers Service"]
+direction TB
+  WorkerApp["Worker App"]
+  WorkerApp@{ shape: rounded }
+  WorkerApp:::app
+
+  WorkerDomain["Job Processing Domain"]
+  WorkerDomain@{ shape: trap-b }
+  WorkerDomain:::domain
+
+  WorkerApp --> WorkerDomain
+end
+
+RedisQueues --> WorkerApp
+
+%% -------------------------
+%% AUTH SERVICE (OPTIONAL EXTRACTION)
+%% -------------------------
+
+subgraph AuthSvc["Auth Service (Optional)"]
+direction TB
+  AuthApp["Auth App"]
+  AuthApp@{ shape: rounded }
+  AuthApp:::app
+
+  AuthDomain["Auth Domain"]
+  AuthDomain@{ shape: trap-b }
+  AuthDomain:::domain
+
+  AuthApp --> AuthDomain
+end
+
+AuthDomain --> JWT
+
+%% =========================================================
+%% SEARCH (MINIMAL, ASYNC)
+%% =========================================================
+
+SearchIndex["Search Index<br>(Postgres FTS / Elastic)"]
+SearchIndex@{ shape: cylinder }
+SearchIndex:::persistence
+
+WorkersSvc --> SearchIndex
+AppLayer --> SearchIndex
+
+%% =========================================================
+%% OBSERVABILITY & ANALYTICS (NON-INTRUSIVE)
+%% =========================================================
+
+Observability["Logs / Metrics / Traces"]
+Observability@{ shape: lean-r }
+Observability:::observability
+
+Analytics["Analytics / BI"]
+Analytics@{ shape: lean-r }
+Analytics:::observability
+
+Monolith --> Observability
+NotificationsSvc --> Observability
+WorkersSvc --> Observability
+
+AuditDomain --> Analytics
+
+classDef clients fill:#ffe6e6,stroke:#d0021b,color:#424242;
+classDef app fill:#ffeacc,stroke:#ff6d00,color:#424242;
+classDef domain fill:#fff2cc,stroke:#f5a623,color:#424242;
+classDef persistence fill:#e6f7e6,stroke:#7ed321,color:#424242;
+classDef infra fill:#e6f0ff,stroke:#4a90e2,color:#424242;
+classDef sec fill:#ccd9ff,stroke:#003399,color:#424242;
+classDef observability fill:#f9e6ff,stroke:#9013fe,color:#424242;
+classDef future fill:#e6e6e6,stroke:#9b9b9b,color:#424242,stroke-dasharray: 5 5;
