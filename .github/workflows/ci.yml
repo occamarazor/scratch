@@ -36,8 +36,8 @@ jobs:
       JWT_EXPIRES_IN: 1h
 
     steps:
-      - name: Checkout repository
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
