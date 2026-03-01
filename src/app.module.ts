@@ -1,5 +1,5 @@
 import { Nullable } from '@common/types';
-import { NODE_ENV_DEVELOPMENT } from '@config/config.constants';
+import { NODE_ENV_DEVELOPMENT, NODE_ENV_TEST } from '@config/config.constants';
 import configuration from '@config/config.factory';
 import type { AppConfig, DatabaseConfig } from '@config/config.types';
 import { NodeEnv } from '@config/config.types';
@@ -28,6 +28,7 @@ import { TasksModule } from '@tasks/tasks.module';
 
         const nodeEnv: Nullable<NodeEnv> = cfg.get('nodeEnv', { infer: true });
         const isDev: boolean = nodeEnv === NODE_ENV_DEVELOPMENT;
+        const isTest = nodeEnv === NODE_ENV_TEST;
 
         return {
           type: 'postgres',
@@ -39,7 +40,11 @@ import { TasksModule } from '@tasks/tasks.module';
           autoLoadEntities: true,
           // Do NOT use synchronize in prod; for dev set via env
           synchronize: false,
-          logging: isDev ? ['error', 'warn', 'query'] : ['error'],
+          logging: isDev
+            ? ['error', 'warn', 'query']
+            : isTest
+              ? ['error'] // minimal logging in CI
+              : ['error'],
         } as TypeOrmModuleOptions;
       },
     }),
