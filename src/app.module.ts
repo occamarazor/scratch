@@ -9,6 +9,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { TasksModule } from '@tasks/tasks.module';
 
+import { AuthModule } from './auth/auth.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot<AppConfig>({
@@ -49,6 +51,7 @@ import { TasksModule } from '@tasks/tasks.module';
       },
     }),
     TasksModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

@@ -25,6 +25,7 @@
     "paths": {
       "@config/*": ["src/config/*"],
       "@common/*": ["src/common/*"],
+      "@auth/*": ["src/modules/auth/*"],
       "@tasks/*": ["src/modules/tasks/*"],
       "@test/*": ["test/*"]
     }
