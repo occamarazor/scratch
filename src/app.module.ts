@@ -1,3 +1,4 @@
+import { AuthModule } from '@auth/auth.module';
 import { Nullable } from '@common/types';
 import { NODE_ENV_DEVELOPMENT, NODE_ENV_TEST } from '@config/config.constants';
 import configuration from '@config/config.factory';
@@ -8,8 +9,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { TasksModule } from '@tasks/tasks.module';
-
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -50,8 +49,8 @@ import { AuthModule } from './auth/auth.module';
         } as TypeOrmModuleOptions;
       },
     }),
-    TasksModule,
     AuthModule,
+    TasksModule,
   ],
 })
 export class AppModule {}
