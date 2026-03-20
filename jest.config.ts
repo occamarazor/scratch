@@ -13,7 +13,7 @@ const config: Config.InitialOptions = {
   moduleNameMapper: {
     '^@config/(.*)$': '<rootDir>/src/config/$1',
     '^@common/(.*)$': '<rootDir>/src/common/$1',
-    '^@tasks/(.*)$': '<rootDir>/src/tasks/$1',
+    '^@tasks/(.*)$': '<rootDir>/src/modules/tasks/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
   moduleDirectories: ['node_modules', 'src', 'test'],
