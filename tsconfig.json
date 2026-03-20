@@ -25,7 +25,7 @@
     "paths": {
       "@config/*": ["src/config/*"],
       "@common/*": ["src/common/*"],
-      "@tasks/*": ["src/tasks/*"],
+      "@tasks/*": ["src/modules/tasks/*"],
       "@test/*": ["test/*"]
     }
   }
