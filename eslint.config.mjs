@@ -1,61 +1,164 @@
-// @ts-check
-import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import { FlatCompat } from '@eslint/eslintrc';
+import js from '@eslint/js';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import unusedImports from 'eslint-plugin-unused-imports';
 import sonarjs from 'eslint-plugin-sonarjs';
 import preferArrow from 'eslint-plugin-prefer-arrow';
 import noNull from 'eslint-plugin-no-null';
+import typescriptPlugin from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
 
-export default tseslint.config(
+const compat = new FlatCompat({});
+
+export default [
+  // Base ESLint recommended
+  js.configs.recommended,
+
+  // TS ESLint recommended via compat
+  ...compat.extends(
+    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-type-checked',
+  ),
+
+  // Prettier integration (compat handles this)
+  prettierRecommended,
+
+  // Report unused eslint-disable directives
   {
-    ignores: ['eslint.config.mjs'],
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
+    },
   },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
+
+  // Global custom rules (applies to all files unless a later entry with `files` overrides)
   {
+    // Files / patterns to ignore
+    ignores: [
+      '.eslintrc.js',
+      'eslint.config.mjs',
+
+      // Node modules / package manager
+      'node_modules/',
+      '.pnpm-store/',
+      '.pnp.*',
+
+      // Build / compiled output
+      'dist/',
+      'build/',
+
+      // TypeScript cache / artifacts
+      '*.tsbuildinfo',
+
+      // Coverage
+      'coverage/',
+      '.nyc_output/',
+
+      // Editor
+      '.vscode/',
+      '.idea/',
+      '*.swp',
+      '*.swo',
+
+      // OS
+      '.DS_Store',
+
+      // Logs
+      'logs/',
+      '*.log',
+      'npm-debug.log*',
+      'pnpm-debug.log*',
+      'yarn-debug.log*',
+      'yarn-error.log*',
+
+      // Environments (keep committed .env.dev)
+      '.env',
+      '.env.local',
+      '*.env.local',
+
+      // Compiled JS (lint only TS)
+      '**/*.js',
+      '**/*.map',
+      '**/*.d.ts',
+
+      // Compiled Migrations (lint only TS sources)
+      'src/migrations/**/*.js',
+
+      // Temp
+      '.tmp/',
+      '.temp/',
+
+      // Runtime data
+      'pids',
+      '*.pid',
+      '*.seed',
+      '*.pid.lock',
+
+      // Diagnostic reports
+      'report.*.json',
+    ],
+
+    // TS parser used to enable project-aware rules
+    languageOptions: {
+      sourceType: 'module',
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        project: './tsconfig.json',
+        tsconfigRootDir: new URL('.', import.meta.url).pathname,
+      },
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
+    },
+
+    // eslint-plugin-import helper: resolves tsconfig paths
+    // (requires eslint-import-resolver-typescript)
+    settings: {
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
+      },
+    },
+
     plugins: {
       'simple-import-sort': simpleImportSort,
       'unused-imports': unusedImports,
       sonarjs,
       'prefer-arrow': preferArrow,
       'no-null': noNull,
+      '@typescript-eslint': typescriptPlugin,
     },
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-      },
-      sourceType: 'module',
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: new URL('.', import.meta.url).pathname,
-      },
-    },
+
     rules: {
-      // TypeScript-specific
+      // TypeScript-specific (tune as desired)
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
+
       // Prettier
       'prettier/prettier': 'error',
+
       // Import sorting
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
+
       // Remove unused imports
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'warn',
         { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
       ],
-      // SonarJS rules (quality and complexity)
+
+      // SonarJS rules
       'sonarjs/cognitive-complexity': ['warn', 15],
       'sonarjs/no-duplicate-string': 'warn',
       'sonarjs/no-small-switch': 'warn',
-      // Stylistic rules
+
+      // Prefer arrow functions
       'prefer-arrow/prefer-arrow-functions': [
         'warn',
         {
@@ -64,8 +167,30 @@ export default tseslint.config(
           classPropertiesAllowed: false,
         },
       ],
-      // Disallow null (optional stylistic choice)
+
+      // No null (stylistic)
       'no-null/no-null': 'warn',
     },
   },
-);
+
+  // Test files: disable type-aware rules (faster & fewer false positives)
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts', 'test/**'],
+
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+        ...globals.node,
+      },
+      parserOptions: {
+        ecmaVersion: 'latest',
+        project: undefined, // disable type-checking for tests
+      },
+    },
+
+    rules: {
+      // Relax rules for tests if necessary
+      '@typescript-eslint/no-floating-promises': 'off',
+    },
+  },
+];

@@ -3,8 +3,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
-import { AppModule } from './../src/app.module';
+import { AppModule } from '../../src/app.module';
 
+// TODO: E2E tests
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 

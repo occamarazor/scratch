@@ -1,15 +1,8 @@
-export type Nullable<T> = T | undefined | null;
+export type Nullable<T> = T | undefined;
 
-export enum Notification {
-  INFO = 'INFO',
-  SUCCESS = 'SUCCESS',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
+export interface AuthUser {
+  id: number;
+  email?: string;
 }
 
-export interface Response<T> {
-  timestamp: Date;
-  type: Notification;
-  message: string;
-  data: T;
-}
+export type RequestWithUser = Request & { user?: AuthUser };

@@ -1,10 +1,13 @@
+import { Nullable } from '@common/types';
+import { NODE_ENV_DEVELOPMENT, NODE_ENV_TEST } from '@config/config.constants';
+import configuration from '@config/config.factory';
 import type { AppConfig, DatabaseConfig } from '@config/config.types';
-import configuration from '@config/configuration';
-import validationSchema from '@config/validation';
-import { MessagesModule } from '@messages/messages.module'; // or TasksModule once created
+import { NodeEnv } from '@config/config.types';
+import validationSchema from '@config/config.validation';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TasksModule } from '@tasks/tasks.module';
 
 @Module({
   imports: [
@@ -19,12 +22,13 @@ import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (cfg: ConfigService<AppConfig>): TypeOrmModuleOptions => {
-        const db = cfg.get<DatabaseConfig>('database', { infer: true }) as DatabaseConfig;
+        const db: Nullable<DatabaseConfig> = cfg.get('database', { infer: true });
 
         if (!db) throw new Error('Database configuration not found');
 
-        const nodeEnv = cfg.get<AppConfig['nodeEnv']>('nodeEnv', { infer: true }) ?? 'development';
-        const isDev = nodeEnv === 'development';
+        const nodeEnv: Nullable<NodeEnv> = cfg.get('nodeEnv', { infer: true });
+        const isDev: boolean = nodeEnv === NODE_ENV_DEVELOPMENT;
+        const isTest = nodeEnv === NODE_ENV_TEST;
 
         return {
           type: 'postgres',
@@ -34,12 +38,17 @@ import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
           password: db.password,
           database: db.name,
           autoLoadEntities: true,
-          synchronize: isDev, // only in dev
-          logging: isDev ? ['error', 'warn', 'query'] : ['error'],
+          // Do NOT use synchronize in prod; for dev set via env
+          synchronize: false,
+          logging: isDev
+            ? ['error', 'warn', 'query']
+            : isTest
+              ? ['error'] // minimal logging in CI
+              : ['error'],
         } as TypeOrmModuleOptions;
       },
     }),
-    MessagesModule,
+    TasksModule,
   ],
 })
 export class AppModule {}

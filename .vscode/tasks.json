@@ -153,9 +153,9 @@
       }
     },
     {
-      "label": "Docker: Reset",
+      "label": "Docker: Restart",
       "type": "shell",
-      "command": "pnpm docker:reset",
+      "command": "pnpm docker:restart",
       "problemMatcher": [],
       "detail": "Destroy volumes and start Docker Compose fresh",
       "presentation": {
@@ -166,11 +166,50 @@
       }
     },
     {
-      "label": "DB: Migrate",
+      "label": "DB: Create",
       "type": "shell",
-      "command": "pnpm db:migrate",
+      "command": "pnpm db:create",
       "problemMatcher": [],
-      "detail": "Run TypeORM migrations against the configured DB",
+      "detail": "Create scratch_db (uses psql); ensure Postgres is running",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "DB: Drop",
+      "type": "shell",
+      "command": "pnpm db:drop",
+      "problemMatcher": [],
+      "detail": "Drop scratch_db (uses psql)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "DB: Generate Migration",
+      "type": "shell",
+      "command": "pnpm migrate:generate",
+      "problemMatcher": [],
+      "detail": "Generate a new TypeORM migration (inspect and commit file before running)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "DB: Migrate (run)",
+      "type": "shell",
+      "command": "pnpm migrate:run",
+      "problemMatcher": [],
+      "detail": "Run pending TypeORM migrations against DB",
       "presentation": {
         "reveal": "always",
         "panel": "shared",
@@ -181,9 +220,22 @@
     {
       "label": "DB: Revert Last Migration",
       "type": "shell",
-      "command": "pnpm db:revert",
+      "command": "pnpm migrate:revert",
       "problemMatcher": [],
-      "detail": "Revert the last TypeORM migration",
+      "detail": "Revert the last TypeORM migration (use with care)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "DB: Seed Tasks",
+      "type": "shell",
+      "command": "pnpm seed:tasks",
+      "problemMatcher": [],
+      "detail": "Run tasks seed script (ts-node)",
       "presentation": {
         "reveal": "always",
         "panel": "shared",

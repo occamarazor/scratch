@@ -1,7 +1,10 @@
-import configuration from '@config/configuration';
+import 'reflect-metadata';
+
+import configuration from '@config/config.factory';
+import { AppConfig } from '@config/config.types';
 import { DataSource } from 'typeorm';
 
-const cfg = configuration();
+const cfg: AppConfig = configuration();
 
 const AppDataSource = new DataSource({
   type: 'postgres',
@@ -11,7 +14,10 @@ const AppDataSource = new DataSource({
   password: cfg.database.password,
   database: cfg.database.name,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-  synchronize: true, // only in dev
+  migrations: [__dirname + '/migrations/*{.ts,.js}'],
+  // Do NOT use synchronize in prod; for dev set via env
+  synchronize: false,
+  logging: false,
 });
 
 export default AppDataSource;
