@@ -1,18 +1,23 @@
 import 'reflect-metadata';
 
-import configuration from '@config/configuration';
+import configuration from '@config/config.factory';
+import { AppConfig } from '@config/config.types';
 import { DataSource } from 'typeorm';
 
-const cfg = configuration();
+const cfg: AppConfig = configuration();
 
-export default new DataSource({
+const AppDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DATABASE_HOST ?? cfg.database.host,
-  port: Number(process.env.DATABASE_PORT ?? cfg.database.port),
-  username: process.env.DATABASE_USER ?? cfg.database.user,
-  password: process.env.DATABASE_PASSWORD ?? cfg.database.password,
-  database: process.env.DATABASE_NAME ?? cfg.database.name,
+  host: cfg.database.host,
+  port: cfg.database.port,
+  username: cfg.database.user,
+  password: cfg.database.password,
+  database: cfg.database.name,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
-  synchronize: false, // migrations instead
+  // Do NOT use synchronize in prod; for dev set via env
+  synchronize: false,
+  logging: false,
 });
+
+export default AppDataSource;

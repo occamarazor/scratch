@@ -1,0 +1,96 @@
+### Tasks API — REST client examples for Scratch (Task Tracker)
+# Set base URL (change if your app runs on a different host/port)
+@baseUrl = http://localhost:3000
+
+###
+# List all tasks
+GET {{baseUrl}}/api/tasks
+Accept: application/json
+
+###
+# List tasks for ownerId=1
+GET {{baseUrl}}/api/tasks?ownerId=1
+Accept: application/json
+
+###
+# Create a task (dueAt=null gets omitted)
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Write project README",
+  "description": "Draft README for Scratch app",
+  "priority": 2,
+  "dueAt": null
+}
+
+###
+# Create a task (title=undefined -> 400 validation errors)
+POST {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "description": "This request is invalid because title is missing"
+}
+
+###
+# Bulk partial update (set status for multiple tasks)
+PATCH {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "ids": [1, 2],
+  "patch": {
+    "status": "IN_PROGRESS",
+    "priority": 4
+  }
+}
+
+###
+# Bulk partial update (400 validation errors)
+PATCH {{baseUrl}}/api/tasks
+Content-Type: application/json
+
+{
+  "ids": [1, 2],
+  "patch": {
+    "title": "",
+    "descript": "Mistyped prop",
+    "status": "FAKE_STATUS",
+    "priority": 5,
+    "dueAt": ""
+  }
+}
+
+###
+# Delete all tasks (CAUTION - DEV only)
+DELETE {{baseUrl}}/api/tasks
+
+
+###
+# Get a single task (replace :id as needed)
+GET {{baseUrl}}/api/tasks/1
+Accept: application/json
+
+###
+# Update a task (valid partial update)
+PATCH {{baseUrl}}/api/tasks/1
+Content-Type: application/json
+
+{
+  "status": "DONE",
+  "priority": 0
+}
+
+###
+# Update a task (dueAt=null -> 400 validation error)
+PATCH {{baseUrl}}/api/tasks/1
+Content-Type: application/json
+
+{
+  "dueAt": null
+}
+
+###
+# Delete a single task
+DELETE {{baseUrl}}/api/tasks/1

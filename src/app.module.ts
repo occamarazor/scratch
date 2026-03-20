@@ -1,47 +1,54 @@
+import { Nullable } from '@common/types';
+import { NODE_ENV_DEVELOPMENT, NODE_ENV_TEST } from '@config/config.constants';
+import configuration from '@config/config.factory';
+import type { AppConfig, DatabaseConfig } from '@config/config.types';
+import { NodeEnv } from '@config/config.types';
+import validationSchema from '@config/config.validation';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TasksModule } from '@tasks/tasks.module';
 
-import type { AppConfig, DatabaseConfig } from './config/config.types';
-import configuration from './config/configuration';
-import validationSchema from './config/validation';
-import { MessagesModule } from './messages/messages.module';
-
-// TODO: move & type the whole config
 @Module({
   imports: [
-    ConfigModule.forRoot({
+    ConfigModule.forRoot<AppConfig>({
       isGlobal: true,
       load: [configuration],
       validationSchema,
       cache: true,
-      envFilePath: ['src/messages/.env.development', 'src/messages/.env'],
+      envFilePath: ['.env.dev', '.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (cfg: ConfigService<AppConfig>): TypeOrmModuleOptions => {
-        const db = cfg.get<DatabaseConfig>('database', { infer: true }) as DatabaseConfig;
+        const db: Nullable<DatabaseConfig> = cfg.get('database', { infer: true });
 
         if (!db) throw new Error('Database configuration not found');
 
-        const nodeEnv = cfg.get<AppConfig['nodeEnv']>('nodeEnv', { infer: true });
-        const isDev = nodeEnv === 'development';
+        const nodeEnv: Nullable<NodeEnv> = cfg.get('nodeEnv', { infer: true });
+        const isDev: boolean = nodeEnv === NODE_ENV_DEVELOPMENT;
+        const isTest = nodeEnv === NODE_ENV_TEST;
 
         return {
           type: 'postgres',
           host: db.host,
           port: db.port,
-          database: db.name,
           username: db.user,
           password: db.password,
+          database: db.name,
           autoLoadEntities: true,
-          synchronize: isDev,
-          logging: isDev ? ['error', 'warn', 'query'] : ['error'],
-        } as const;
+          // Do NOT use synchronize in prod; for dev set via env
+          synchronize: false,
+          logging: isDev
+            ? ['error', 'warn', 'query']
+            : isTest
+              ? ['error'] // minimal logging in CI
+              : ['error'],
+        } as TypeOrmModuleOptions;
       },
     }),
-    MessagesModule,
+    TasksModule,
   ],
 })
 export class AppModule {}

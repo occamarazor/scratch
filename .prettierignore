@@ -11,18 +11,14 @@ build/
 *.tsbuildinfo
 
 # Coverage reports
-/coverage
+coverage/
 
 # Docker / local system
 docker-compose.override.yml
 .docker/
 
 # Editor configs
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+.vscode/
 .idea/
 *.swp
 *.swo
@@ -38,17 +34,17 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environments (keep committed .env.dev)
+# Environments (.env.dev committed)
 .env
 .env.local
 *.env.local
 
-# Compiled JS (keep only TS sources)
+# Compiled JS (format only TS sources)
 **/*.js
 **/*.map
 **/*.d.ts
 
-# Compiled Migrations (keep only TS sources)
+# Compiled Migrations (format only TS sources)
 src/migrations/**/*.js
 
 # Temp

@@ -1,98 +1,121 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Scratch
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Scratch is a backend-first task management API built to demonstrate production-grade backend architecture, data modeling, and developer experience rather than feature breadth.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This repository is intentionally architecture-centric. Decisions are explicit, documented, and optimized for long-term SaaS evolution.
 
-## Description
+## Purpose
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Showcase a clean NestJS + TypeScript backend
+- Enforce strong typing and validation at system boundaries
+- Evolve the database exclusively via migrations
+- Maintain a realistic, production-oriented project layout
 
-## Project setup
+## Scope (Phase 1)
 
-```bash
-$ pnpm install
+### In scope
+- Tasks CRUD API
+- DTO validation and error handling
+- PostgreSQL + TypeORM
+- Dockerized local development
+- Test foundations
+
+### Out of scope (for MVP enforcement)
+- End-user UI
+- Billing or quotas
+- Distributed microservices
+- Production-grade observability stacks
+
+Note: Infrastructure, queues, caching, and observability are introduced **progressively and demonstratively** to support architectural learning.
+
+## Project Structure
+
+```
+├── src/
+│ ├── common/                     # Shared utilities, pipes, decorators
+│ ├── config/                     # Typed configuration + validation
+│ ├── migrations/                 # TypeORM migrations
+│ ├── tasks/                      # Tasks feature module
+│ ├── app.module.ts               # Root module
+│ ├── data-source.ts              # TypeORM CLI datasource
+│ └── main.ts                     # Application entrypoint
+├── docs/
+│ ├── architecture/               # System architecture artifacts
+│ │ ├── architecture.md           # System design & trade-offs
+│ │ ├── diagrams/                 # Architecture diagrams
+│ │ │ ├── scratch-executive.mmd
+│ │ │ ├── scratch-executive.png
+│ │ │ ├── scratch-technical-mvp.mmd
+│ │ │ ├── scratch-technical-mvp.png
+│ │ │ ├── scratch-technical-future.mmd
+│ │ │ └── scratch-technical-future.png
+│ │ └── adr/                      # Architectural Decision Records
+│ │   └── *.md
+│ ├── roadmap/                    # Product evolution & milestones
+│ │ └── roadmap.md
+│ ├── requests/                   # HTTP request examples
+│ └── scripts.md                  # pnpm scripts reference
+├── scripts/                      # Executable helper scripts (DB seed, etc.)
+├── test/                         # E2E / integration tests
+├── docker-compose.yml            # Local Docker services (Postgres)
+├── .env.dev                      # Development environment variables
+└── README.md
 ```
 
-## Compile and run the project
+## Requirements
+- Node.js >= 22
+- pnpm >= 10
+- Docker & Docker Compose
+- PostgreSQL 16 (via Docker)
 
-```bash
-# development
-$ pnpm run start
+## Environment
+Environment variables are defined in .env.dev (committed, used by default). Local overrides can be placed in .env.
 
-# watch mode
-$ pnpm run start:dev
+```
+APP_NAME=Scratch
+NODE_ENV=development
+PORT=3000
+FRONTEND_URL=
 
-# production mode
-$ pnpm run start:prod
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=scratch_db
+DATABASE_USER=postgres
+DATABASE_PASSWORD=postgres
+
+JWT_SECRET=
+JWT_EXPIRES_IN=1h
 ```
 
-## Run tests
+## Running Locally
 
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+```
+pnpm install
+pnpm docker:up
+pnpm migrate:run
+pnpm start:dev
 ```
 
-## Deployment
+API will be available at http://localhost:3000.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Endpoints
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+| **Method** | **Endpoint**     | **Description**                     |
+| ---------- | ---------------- | ----------------------------------- |
+| GET        | `/api/tasks`     | List tasks                          |
+| POST       | `/api/tasks`     | Create task                         |
+| PATCH      | `/api/tasks`     | Bulk update tasks                   |
+| DELETE     | `/api/tasks`     | Delete all tasks                    |
+| GET        | `/api/tasks/:id` | Get task by id                      |
+| PATCH      | `/api/tasks/:id` | Update task                         |
+| DELETE     | `/api/tasks/:id` | Delete task                         |
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Documentation
+- docs/roadmap/roadmap.md — phased product evolution plan
+- docs/architecture/architecture.md — core system design and trade-offs
+- docs/architecture/diagrams/*.png — visual architecture diagrams
+- docs/architecture/diagrams/*.mmd — architecture diagrams code
+- scratch-technical-future.mmd represents a **defensible evolution path**, not an immediately implemented system
+- docs/architecture/adr/*.md — architectural decision records
+- docs/requests/*.http — example API calls
+- docs/scripts.md — complete pnpm scripts reference
