@@ -6,6 +6,7 @@
 # 🔐 Paste your generated JWT here
 @token1 = token1
 @token2 = token2
+
 # ❌ List user tasks (401, no token)
 GET {{baseUrl}}/api/tasks
 Accept: application/json
@@ -13,7 +14,7 @@ Accept: application/json
 ###
 # ✅ List user tasks (derived from token)
 GET {{baseUrl}}/api/tasks
-Authorization: Bearer {{token2}}
+Authorization: Bearer {{token1}}
 Accept: application/json
 
 ###

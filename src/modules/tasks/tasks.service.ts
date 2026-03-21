@@ -1,5 +1,7 @@
+import { JwtAuthGuard } from '@auth/jwt.guard';
 import type { Nullable } from '@common/types';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common/decorators';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject, ValidationError } from 'class-validator';
@@ -10,7 +12,7 @@ import type { TaskResponseDto } from './dto/task-response.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskEntity } from './entities/task.entity';
 import type { Task } from './tasks.types';
-
+@UseGuards(JwtAuthGuard)
 @Injectable()
 export class TasksService {
   constructor(
