@@ -12,6 +12,7 @@ export interface Task {
   description?: Nullable<string>;
   status: TaskStatus;
   priority: number;
+  tenantId: string;
   ownerId: string;
   dueAt?: Nullable<Date>;
   createdAt: Date;

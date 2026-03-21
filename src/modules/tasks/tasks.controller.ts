@@ -31,7 +31,7 @@ export class TasksController {
 
   @Get()
   async getTasks(@CurrentUser() user: UserContext): Promise<TaskResponseDto[]> {
-    const tasksList: Task[] = await this.tasksService.getTasks(user.userId);
+    const tasksList: Task[] = await this.tasksService.getTasks(user);
     return tasksList.map((t) => this.tasksService.domainToResponse(t));
   }
 
@@ -41,7 +41,7 @@ export class TasksController {
     @Body() dto: CreateTaskDto,
     @CurrentUser() user: UserContext,
   ): Promise<TaskResponseDto> {
-    const taskCreated: Task = await this.tasksService.createTask(dto, user.userId);
+    const taskCreated: Task = await this.tasksService.createTask(dto, user);
     return this.tasksService.domainToResponse(taskCreated);
   }
 
@@ -50,14 +50,14 @@ export class TasksController {
     @Body() { ids, patch }: { ids: number[]; patch: Partial<UpdateTaskDto> },
     @CurrentUser() user: UserContext,
   ): Promise<TasksUpdateResponse> {
-    const affectedTasks: number = await this.tasksService.updateTasks(ids, patch, user.userId);
+    const affectedTasks: number = await this.tasksService.updateTasks(ids, patch, user);
     return { affectedTasks };
   }
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTasks(@CurrentUser() user: UserContext): Promise<void> {
-    await this.tasksService.deleteTasks(user.userId);
+    await this.tasksService.deleteTasks(user);
   }
 
   @Get(':id')
@@ -65,7 +65,7 @@ export class TasksController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: UserContext,
   ): Promise<TaskResponseDto> {
-    const taskFound: Nullable<Task> = await this.tasksService.getTaskById(id, user.userId);
+    const taskFound: Nullable<Task> = await this.tasksService.getTaskById(id, user);
     if (!taskFound) throw new NotFoundException(`Task with ID: ${id} not found`);
     return this.tasksService.domainToResponse(taskFound);
   }
@@ -77,11 +77,7 @@ export class TasksController {
     @Body() dto: UpdateTaskDto,
     @CurrentUser() user: UserContext,
   ): Promise<TaskResponseDto> {
-    const taskUpdated: Nullable<Task> = await this.tasksService.updateTaskById(
-      id,
-      dto,
-      user.userId,
-    );
+    const taskUpdated: Nullable<Task> = await this.tasksService.updateTaskById(id, dto, user);
     if (!taskUpdated) throw new NotFoundException(`Task with ID: ${id} not found`);
     return this.tasksService.domainToResponse(taskUpdated);
   }
@@ -92,7 +88,7 @@ export class TasksController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: UserContext,
   ): Promise<void> {
-    const deletionResult: boolean = await this.tasksService.deleteTaskById(id, user.userId);
+    const deletionResult: boolean = await this.tasksService.deleteTaskById(id, user);
     if (!deletionResult) throw new NotFoundException(`Task with ID: ${id} not found`);
     return;
   }

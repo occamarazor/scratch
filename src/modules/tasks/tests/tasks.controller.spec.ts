@@ -47,43 +47,65 @@ describe('TasksController', () => {
   });
 
   it('getTasks: should return a list of response DTOs on success', async () => {
-    const user: UserContext = { userId: 'user-123', tenantId: 'tenant-abc' };
-    const t1: Task = generateTask({ title: 'A', status: TaskStatus.TODO });
-    const t2: Task = generateTask({ title: 'B', status: TaskStatus.DONE });
+    const tenantId: string = 'tenant-abc';
+    const ownerId: string = 'user-123';
+    const user: UserContext = { userId: ownerId, tenantId };
+
+    const t1: Task = generateTask({
+      title: 'A',
+      status: TaskStatus.TODO,
+      tenantId,
+      ownerId,
+    });
+
+    const t2: Task = generateTask({
+      title: 'B',
+      status: TaskStatus.DONE,
+      tenantId,
+      ownerId,
+    });
 
     (serviceMock.getTasks as jest.Mock).mockResolvedValue([t1, t2]);
 
     const result: TaskResponseDto[] = await controller.getTasks(user);
 
-    expect(serviceMock.getTasks).toHaveBeenCalledWith(user.userId);
+    expect(serviceMock.getTasks).toHaveBeenCalledWith(user);
     expect(serviceMock.domainToResponse).toHaveBeenCalledTimes(2);
     expect(result).toHaveLength(2);
     expect(result[0].title).toBe('A');
+    expect(result[0].tenantId).toBe(tenantId);
     expect(result[1].status).toBe(TaskStatus.DONE);
+    expect(result[1].ownerId).toBe(ownerId);
   });
 
   it('getTasks: should forward ownerId to service when provided', async () => {
-    const user: UserContext = { userId: 'user-123', tenantId: 'tenant-abc' };
-    const found: Task = generateTask({ title: 'OwnerTask', ownerId: user.userId });
+    const tenantId: string = 'tenant-abc';
+    const ownerId: string = 'user-123';
+    const user: UserContext = { userId: ownerId, tenantId };
+    const found: Task = generateTask({ title: 'OwnerTask', tenantId, ownerId });
 
     (serviceMock.getTasks as jest.Mock).mockResolvedValue([found]);
 
     const result: TaskResponseDto[] = await controller.getTasks(user);
-    expect(serviceMock.getTasks).toHaveBeenCalledWith(user.userId);
+    expect(serviceMock.getTasks).toHaveBeenCalledWith(user);
     expect(result).toHaveLength(1);
-    expect(result[0].ownerId).toBe(user.userId);
+    expect(result[0].tenantId).toBe(tenantId);
+    expect(result[0].ownerId).toBe(ownerId);
   });
 
   it('createTask: should forward current user id to service when provided', async () => {
-    const user: UserContext = { userId: 'user-321', tenantId: 'tenant-xyz' };
+    const tenantId: string = 'tenant-xyz';
+    const ownerId: string = 'user-321';
+    const user: UserContext = { userId: ownerId, tenantId };
+
     const dto: CreateTaskDto = generateCreateTaskDto();
-    const created: Task = generateTask({ title: dto.title, ownerId: user.userId });
+    const created: Task = generateTask({ title: dto.title, tenantId, ownerId });
 
     (serviceMock.createTask as jest.Mock).mockResolvedValue(created);
 
     const result: TaskResponseDto = await controller.createTask(dto, user);
-    expect(serviceMock.createTask).toHaveBeenCalledWith(dto, user.userId);
-    expect(result.ownerId).toBe(user.userId);
+    expect(serviceMock.createTask).toHaveBeenCalledWith(dto, user);
+    expect(result.ownerId).toBe(ownerId);
   });
 
   it('updateTasks: should return affected count on success', async () => {
@@ -95,7 +117,7 @@ describe('TasksController', () => {
     (serviceMock.updateTasks as jest.Mock).mockResolvedValue(affectedTasks);
 
     const result: TasksUpdateResponse = await controller.updateTasks({ ids, patch }, user);
-    expect(serviceMock.updateTasks).toHaveBeenCalledWith(ids, patch, user.userId);
+    expect(serviceMock.updateTasks).toHaveBeenCalledWith(ids, patch, user);
     expect(result.affectedTasks).toBe(affectedTasks);
   });
 
@@ -107,7 +129,7 @@ describe('TasksController', () => {
     (serviceMock.updateTasks as jest.Mock).mockResolvedValue(0);
 
     const result: TasksUpdateResponse = await controller.updateTasks({ ids, patch }, user);
-    expect(serviceMock.updateTasks).toHaveBeenCalledWith(ids, patch, user.userId);
+    expect(serviceMock.updateTasks).toHaveBeenCalledWith(ids, patch, user);
     expect(result.affectedTasks).toBe(0);
   });
 
@@ -131,46 +153,57 @@ describe('TasksController', () => {
   });
 
   it('getTaskById: should return response DTO on success', async () => {
-    const user: UserContext = { userId: 'user-893', tenantId: 'tenant-rtf' };
+    const tenantId: string = 'tenant-rtf';
+    const ownerId: string = 'user-893';
+    const user: UserContext = { userId: ownerId, tenantId };
     const taskId: number = 32;
-    const found: Task = generateTask({ id: taskId, ownerId: user.userId });
+
+    const found: Task = generateTask({ id: taskId, tenantId, ownerId });
 
     (serviceMock.getTaskById as jest.Mock).mockResolvedValue(found);
 
     const result: TaskResponseDto = await controller.getTaskById(taskId, user);
 
-    expect(serviceMock.getTaskById).toHaveBeenCalledWith(taskId, user.userId);
+    expect(serviceMock.getTaskById).toHaveBeenCalledWith(taskId, user);
     expect(result.id).toBe(taskId);
-    expect(result.ownerId).toBe(user.userId);
+    expect(result.tenantId).toBe(tenantId);
+    expect(result.ownerId).toBe(ownerId);
   });
 
   it('getTaskById: should throw NotFoundException when failed', async () => {
     const user: UserContext = { userId: 'user-893', tenantId: 'tenant-rtf' };
+    const taskId: number = 999;
+
     (serviceMock.getTaskById as jest.Mock).mockResolvedValue(undefined);
-    await expect(controller.getTaskById(999, user)).rejects.toThrow(NotFoundException);
+    await expect(controller.getTaskById(taskId, user)).rejects.toThrow(NotFoundException);
   });
 
   it('updateTaskById: should return response DTO on success', async () => {
-    const user: UserContext = { userId: 'user-244', tenantId: 'tenant-kdl' };
+    const tenantId: string = 'tenant-kdl';
+    const ownerId: string = 'user-244';
+    const user: UserContext = { userId: ownerId, tenantId };
     const taskId: number = 12;
+
     const dto: UpdateTaskDto = generateUpdateTaskDto({ title: 'updated', priority: 2 });
     const updated: Task = generateTask({
       id: taskId,
       title: dto.title,
       priority: dto.priority,
-      ownerId: user.userId,
+      tenantId,
+      ownerId,
     });
 
     (serviceMock.updateTaskById as jest.Mock).mockResolvedValue(updated);
 
     const result: TaskResponseDto = await controller.updateTaskById(taskId, dto, user);
 
-    expect(serviceMock.updateTaskById).toHaveBeenCalledWith(taskId, dto, user.userId);
+    expect(serviceMock.updateTaskById).toHaveBeenCalledWith(taskId, dto, user);
     expect(serviceMock.domainToResponse).toHaveBeenCalledWith(updated);
     expect(result.id).toBe(taskId);
     expect(result.title).toBe(dto.title);
     expect(result.priority).toBe(dto.priority);
-    expect(result.ownerId).toBe(user.userId);
+    expect(result.tenantId).toBe(tenantId);
+    expect(result.ownerId).toBe(ownerId);
   });
 
   it('updateTaskById: should throw NotFoundException when failed', async () => {
@@ -189,7 +222,7 @@ describe('TasksController', () => {
     (serviceMock.deleteTaskById as jest.Mock).mockResolvedValue(true);
 
     await expect(controller.deleteTaskById(taskId, user)).resolves.toBeUndefined();
-    expect(serviceMock.deleteTaskById).toHaveBeenCalledWith(taskId, user.userId);
+    expect(serviceMock.deleteTaskById).toHaveBeenCalledWith(taskId, user);
   });
 
   it('deleteTaskById: should throw NotFoundException when failed', async () => {

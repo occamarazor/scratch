@@ -12,6 +12,7 @@ export class TaskResponseDto {
   description?: Nullable<string>;
   status!: TaskStatus;
   priority!: number;
+  tenantId!: string;
   ownerId!: string;
   dueAt?: Nullable<string>;
   createdAt!: string;

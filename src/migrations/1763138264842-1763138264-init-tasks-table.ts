@@ -11,6 +11,7 @@ export class InitTasksTable1763138264842 implements MigrationInterface {
       "description" text,
       "status" varchar(11) NOT NULL DEFAULT 'TODO',
       "priority" integer NOT NULL DEFAULT 0,
+      "tenantId" varchar(36) NOT NULL,
       "ownerId" varchar(36) NOT NULL,
       "dueAt" timestamptz,
       "createdAt" timestamptz NOT NULL DEFAULT now(),
@@ -20,7 +21,7 @@ export class InitTasksTable1763138264842 implements MigrationInterface {
 
     // Add index (same columns, readable name)
     await queryRunner.query(`
-      CREATE INDEX "IDX_tasks_owner_status_priority" ON "tasks" ("ownerId", "status", "priority");
+      CREATE INDEX "IDX_tasks_owner_status_priority" ON "tasks" ("tenantId", "ownerId", "status", "priority");
     `);
 
     // Add DB-level priority range check

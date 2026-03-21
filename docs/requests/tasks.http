@@ -4,8 +4,10 @@
 @baseUrl = http://localhost:3000
 
 # 🔐 Paste your generated JWT here
-@token1 = token1
-@token2 = token2
+@token1 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEiLCJ0ZW5hbnRJZCI6InRlbmFudC0xIiwiaWF0IjoxNzc0MTA4MzQzLCJleHAiOjE3NzY3MDAzNDN9.YxgS5OGx8Mb4gDg0SdQicBMRjXEwSt7YLaztpDS60l0
+@token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTIiLCJ0ZW5hbnRJZCI6InRlbmFudC0yIiwiaWF0IjoxNzc0MTA4MzY1LCJleHAiOjE3NzY3MDAzNjV9.SdK7y9eqKtFkr190Jokl5bK4c8DKO_M7AwFITbisT0U
+# @token1 = token1
+# @token2 = token2
 
 # ❌ List user tasks (401, no token)
 GET {{baseUrl}}/api/tasks

@@ -1,4 +1,4 @@
-import type { Nullable } from '@common/types';
+import type { Nullable, UserContext } from '@common/types';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -25,6 +25,7 @@ export class TasksService {
       description: e.description ?? undefined,
       status: e.status,
       priority: e.priority,
+      tenantId: e.tenantId,
       ownerId: e.ownerId,
       dueAt: e.dueAt ?? undefined,
       createdAt: e.createdAt,
@@ -40,6 +41,7 @@ export class TasksService {
       description: task.description,
       status: task.status,
       priority: task.priority,
+      tenantId: task.tenantId,
       ownerId: task.ownerId,
       // Dates as ISO strings (safe for FE)
       dueAt: task.dueAt ? new Date(task.dueAt).toISOString() : undefined,
@@ -48,30 +50,38 @@ export class TasksService {
     };
   }
 
-  async getTasks(ownerId: string): Promise<Task[]> {
+  async getTasks(user: UserContext): Promise<Task[]> {
+    const { userId: ownerId, tenantId } = user;
     const taskEntities: TaskEntity[] = await this.tasksRepository.find({
-      where: { ownerId },
+      where: { ownerId, tenantId },
       order: { priority: 'DESC', createdAt: 'DESC' },
     });
+
     return taskEntities.map((e) => this.entityToDomain(e));
   }
 
-  async createTask(dto: CreateTaskDto, ownerId: string): Promise<Task> {
+  async createTask(dto: CreateTaskDto, user: UserContext): Promise<Task> {
+    const { userId: ownerId, tenantId } = user;
+
     const taskEntityCreated: TaskEntity = this.tasksRepository.create({
       ...dto,
       dueAt: dto.dueAt ? new Date(dto.dueAt) : undefined,
       ownerId,
+      tenantId,
     });
     const taskEntitySaved: TaskEntity = await this.tasksRepository.save(taskEntityCreated);
+
     return this.entityToDomain(taskEntitySaved);
   }
 
   async updateTasks(
     ids: number[],
     patch: Partial<UpdateTaskDto>,
-    ownerId: string,
+    user: UserContext,
   ): Promise<number> {
     if (!Array.isArray(ids) || ids.length === 0) return 0;
+
+    const { userId: ownerId, tenantId } = user;
 
     // Validate patch using UpdateTaskDto rules
     const dtoInstance: UpdateTaskDto = plainToInstance(UpdateTaskDto, patch);
@@ -123,25 +133,33 @@ export class TasksService {
       .createQueryBuilder()
       .update(TaskEntity)
       .set(updatePayload)
-      .where('id IN (:...ids) AND ownerId = :ownerId', { ids, ownerId })
+      .where('id IN (:...ids) AND tenantId = :tenantId AND ownerId = :ownerId', {
+        ids,
+        tenantId,
+        ownerId,
+      })
       .execute();
 
     return res.affected ?? 0;
   }
 
-  async deleteTasks(ownerId: string): Promise<void> {
-    await this.tasksRepository.delete({ ownerId });
+  async deleteTasks(user: UserContext): Promise<void> {
+    const { userId: ownerId, tenantId } = user;
+    await this.tasksRepository.delete({ tenantId, ownerId });
   }
 
-  async getTaskById(id: number, ownerId: string): Promise<Nullable<Task>> {
+  async getTaskById(id: number, user: UserContext): Promise<Nullable<Task>> {
+    const { userId: ownerId, tenantId } = user;
     const taskEntityFound: Nullable<TaskEntity> =
-      (await this.tasksRepository.findOne({ where: { id, ownerId } })) ?? undefined;
+      (await this.tasksRepository.findOne({ where: { id, tenantId, ownerId } })) ?? undefined;
+
     return taskEntityFound ? this.entityToDomain(taskEntityFound) : undefined;
   }
 
-  async updateTaskById(id: number, dto: UpdateTaskDto, ownerId: string): Promise<Nullable<Task>> {
+  async updateTaskById(id: number, dto: UpdateTaskDto, user: UserContext): Promise<Nullable<Task>> {
+    const { userId: ownerId, tenantId } = user;
     const taskEntityUpdated: Nullable<TaskEntity> =
-      (await this.tasksRepository.findOne({ where: { id, ownerId } })) ?? undefined;
+      (await this.tasksRepository.findOne({ where: { id, tenantId, ownerId } })) ?? undefined;
 
     if (!taskEntityUpdated) return undefined;
 
@@ -156,8 +174,14 @@ export class TasksService {
     return this.entityToDomain(taskEntitySaved);
   }
 
-  async deleteTaskById(id: number, ownerId: string): Promise<boolean> {
-    const deletionResult: DeleteResult = await this.tasksRepository.delete({ id, ownerId });
+  async deleteTaskById(id: number, user: UserContext): Promise<boolean> {
+    const { userId: ownerId, tenantId } = user;
+    const deletionResult: DeleteResult = await this.tasksRepository.delete({
+      id,
+      tenantId,
+      ownerId,
+    });
+
     return (deletionResult.affected ?? 0) === 1;
   }
 }

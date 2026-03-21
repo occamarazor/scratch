@@ -15,7 +15,7 @@ import {
 import { TaskStatus } from '../tasks.types';
 
 @Entity('tasks')
-@Index(['ownerId', 'status', 'priority'])
+@Index(['tenantId', 'ownerId', 'status', 'priority'])
 @Check(`"priority" >= 0 AND "priority" <= 4`) // 0–4 range enforced
 export class TaskEntity {
   @PrimaryGeneratedColumn()
@@ -37,6 +37,9 @@ export class TaskEntity {
 
   @Column({ type: 'int', default: 0 })
   priority!: number;
+
+  @Column({ type: 'varchar', length: 36 })
+  tenantId!: string;
 
   @Column({ type: 'varchar', length: 36 })
   ownerId!: string;
