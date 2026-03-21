@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from '@auth/jwt.guard';
 import { CurrentUser } from '@common/decorators';
 import type { Nullable, UserContext } from '@common/types';
 import {
@@ -15,6 +16,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common/decorators';
 
 import { CreateTaskDto } from './dto/create-task.dto';
 import type { TaskResponseDto } from './dto/task-response.dto';
@@ -22,6 +24,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 import type { Task, TasksUpdateResponse } from './tasks.types';
 
+@UseGuards(JwtAuthGuard)
 @Controller('/api/tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
