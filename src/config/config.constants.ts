@@ -21,7 +21,7 @@ export const AppConfigDefaults: AppConfig = {
   },
 
   auth: {
-    jwtSecret: undefined as Nullable<string>, // TODO: allow bootstrapping without in early dev
+    jwtSecret: '',
     jwtExpiresIn: '1h',
   },
 } as const;

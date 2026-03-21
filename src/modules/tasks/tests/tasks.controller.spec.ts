@@ -1,4 +1,4 @@
-import type { AuthUser } from '@common/types';
+import type { UserContext } from '@common/types';
 import { NotFoundException } from '@nestjs/common';
 import type { CreateTaskDto } from '@tasks/dto/create-task.dto';
 import type { TaskResponseDto } from '@tasks/dto/task-response.dto';
@@ -61,7 +61,7 @@ describe('TasksController', () => {
   });
 
   it('getTasks: should forward ownerId to service when provided', async () => {
-    const ownerId: number = 7;
+    const ownerId: string = 'owner-123';
     const found: Task = generateTask({ title: 'OwnerTask', ownerId });
     (serviceMock.getTasks as jest.Mock).mockResolvedValue([found]);
 
@@ -88,7 +88,7 @@ describe('TasksController', () => {
     const dto: CreateTaskDto = generateCreateTaskDto();
     const created: Task = generateTask({ title: dto.title, ownerId: userId });
     // Simulate invocation with CurrentUser present by calling the controller method directly
-    const userMock: AuthUser = { id: userId };
+    const userMock: UserContext = { userId };
 
     (serviceMock.createTask as jest.Mock).mockResolvedValue(created);
 

@@ -1,6 +1,5 @@
 import { CurrentUser } from '@common/decorators';
-import { ParseNullableIntPipe } from '@common/pipes';
-import type { AuthUser, Nullable } from '@common/types';
+import type { Nullable, UserContext } from '@common/types';
 import {
   Body,
   Controller,
@@ -13,7 +12,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -29,12 +27,8 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  async getTasks(
-    @Query('ownerId', ParseNullableIntPipe) ownerId?: number,
-  ): Promise<TaskResponseDto[]> {
-    // TODO: fix validation, query tries to parse ownerId as number showing NaN instead of initial input
-    // console.log('ownerId: ', ownerId);
-    const tasksList: Task[] = await this.tasksService.getTasks(ownerId);
+  async getTasks(@CurrentUser() user: UserContext): Promise<TaskResponseDto[]> {
+    const tasksList: Task[] = await this.tasksService.getTasks(user.userId);
     return tasksList.map((t) => this.tasksService.domainToResponse(t));
   }
 
@@ -42,29 +36,33 @@ export class TasksController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async createTask(
     @Body() dto: CreateTaskDto,
-    @CurrentUser() user?: AuthUser,
+    @CurrentUser() user: UserContext,
   ): Promise<TaskResponseDto> {
-    const taskCreated: Task = await this.tasksService.createTask(dto, user?.id);
+    const taskCreated: Task = await this.tasksService.createTask(dto, user.userId);
     return this.tasksService.domainToResponse(taskCreated);
   }
 
   @Patch()
   async updateTasks(
     @Body() { ids, patch }: { ids: number[]; patch: Partial<UpdateTaskDto> },
+    @CurrentUser() user: UserContext,
   ): Promise<TasksUpdateResponse> {
-    const affectedTasks: number = await this.tasksService.updateTasks(ids, patch);
+    const affectedTasks: number = await this.tasksService.updateTasks(ids, patch, user.userId);
     return { affectedTasks };
   }
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteTasks(): Promise<void> {
-    await this.tasksService.deleteTasks();
+  async deleteTasks(@CurrentUser() user: UserContext): Promise<void> {
+    await this.tasksService.deleteTasks(user.userId);
   }
 
   @Get(':id')
-  async getTaskById(@Param('id', ParseIntPipe) id: number): Promise<TaskResponseDto> {
-    const taskFound: Nullable<Task> = await this.tasksService.getTaskById(id);
+  async getTaskById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserContext,
+  ): Promise<TaskResponseDto> {
+    const taskFound: Nullable<Task> = await this.tasksService.getTaskById(id, user.userId);
     if (!taskFound) throw new NotFoundException(`Task with ID: ${id} not found`);
     return this.tasksService.domainToResponse(taskFound);
   }
@@ -74,16 +72,24 @@ export class TasksController {
   async updateTaskById(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTaskDto,
+    @CurrentUser() user: UserContext,
   ): Promise<TaskResponseDto> {
-    const taskUpdated: Nullable<Task> = await this.tasksService.updateTaskById(id, dto);
+    const taskUpdated: Nullable<Task> = await this.tasksService.updateTaskById(
+      id,
+      dto,
+      user.userId,
+    );
     if (!taskUpdated) throw new NotFoundException(`Task with ID: ${id} not found`);
     return this.tasksService.domainToResponse(taskUpdated);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteTaskById(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    const deletionResult: boolean = await this.tasksService.deleteTaskById(id);
+  async deleteTaskById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserContext,
+  ): Promise<void> {
+    const deletionResult: boolean = await this.tasksService.deleteTaskById(id, user.userId);
     if (!deletionResult) throw new NotFoundException(`Task with ID: ${id} not found`);
     return;
   }

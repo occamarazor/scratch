@@ -26,8 +26,8 @@ export class TasksService {
       description: e.description ?? undefined,
       status: e.status,
       priority: e.priority,
+      ownerId: e.ownerId,
       dueAt: e.dueAt ?? undefined,
-      ownerId: e.ownerId ?? undefined,
       createdAt: e.createdAt,
       updatedAt: e.updatedAt,
     };
@@ -49,26 +49,29 @@ export class TasksService {
     };
   }
 
-  async getTasks(ownerId?: number): Promise<Task[]> {
-    const where: Nullable<{ ownerId: number }> = ownerId !== undefined ? { ownerId } : undefined;
+  async getTasks(ownerId: string): Promise<Task[]> {
     const taskEntities: TaskEntity[] = await this.tasksRepository.find({
-      where,
+      where: { ownerId },
       order: { priority: 'DESC', createdAt: 'DESC' },
     });
     return taskEntities.map((e) => this.entityToDomain(e));
   }
 
-  async createTask(dto: CreateTaskDto, ownerId?: number): Promise<Task> {
+  async createTask(dto: CreateTaskDto, ownerId: string): Promise<Task> {
     const taskEntityCreated: TaskEntity = this.tasksRepository.create({
       ...dto,
       dueAt: dto.dueAt ? new Date(dto.dueAt) : undefined,
-      ownerId: ownerId ?? undefined,
+      ownerId,
     });
     const taskEntitySaved: TaskEntity = await this.tasksRepository.save(taskEntityCreated);
     return this.entityToDomain(taskEntitySaved);
   }
 
-  async updateTasks(ids: number[], patch: Partial<UpdateTaskDto>): Promise<number> {
+  async updateTasks(
+    ids: number[],
+    patch: Partial<UpdateTaskDto>,
+    ownerId: string,
+  ): Promise<number> {
     if (!Array.isArray(ids) || ids.length === 0) return 0;
 
     // Validate patch using UpdateTaskDto rules
@@ -121,26 +124,25 @@ export class TasksService {
       .createQueryBuilder()
       .update(TaskEntity)
       .set(updatePayload)
-      .where('id IN (:...ids)', { ids })
+      .where('id IN (:...ids) AND ownerId = :ownerId', { ids, ownerId })
       .execute();
 
     return res.affected ?? 0;
   }
 
-  // TODO: CAUTION! Guard, deletes all tasks
-  async deleteTasks(): Promise<void> {
-    await this.tasksRepository.clear();
+  async deleteTasks(ownerId: string): Promise<void> {
+    await this.tasksRepository.delete({ ownerId });
   }
 
-  async getTaskById(id: number): Promise<Nullable<Task>> {
+  async getTaskById(id: number, ownerId: string): Promise<Nullable<Task>> {
     const taskEntityFound: Nullable<TaskEntity> =
-      (await this.tasksRepository.findOne({ where: { id } })) ?? undefined;
+      (await this.tasksRepository.findOne({ where: { id, ownerId } })) ?? undefined;
     return taskEntityFound ? this.entityToDomain(taskEntityFound) : undefined;
   }
 
-  async updateTaskById(id: number, dto: UpdateTaskDto): Promise<Nullable<Task>> {
+  async updateTaskById(id: number, dto: UpdateTaskDto, ownerId: string): Promise<Nullable<Task>> {
     const taskEntityUpdated: Nullable<TaskEntity> =
-      (await this.tasksRepository.findOne({ where: { id } })) ?? undefined;
+      (await this.tasksRepository.findOne({ where: { id, ownerId } })) ?? undefined;
 
     if (!taskEntityUpdated) return undefined;
 
@@ -155,8 +157,8 @@ export class TasksService {
     return this.entityToDomain(taskEntitySaved);
   }
 
-  async deleteTaskById(id: number): Promise<boolean> {
-    const deletionResult: DeleteResult = await this.tasksRepository.delete(id);
+  async deleteTaskById(id: number, ownerId: string): Promise<boolean> {
+    const deletionResult: DeleteResult = await this.tasksRepository.delete({ id, ownerId });
     return (deletionResult.affected ?? 0) === 1;
   }
 }

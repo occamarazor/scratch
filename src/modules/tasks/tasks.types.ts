@@ -12,8 +12,8 @@ export interface Task {
   description?: Nullable<string>;
   status: TaskStatus;
   priority: number;
+  ownerId: string;
   dueAt?: Nullable<Date>;
-  ownerId?: Nullable<number>;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -38,11 +38,11 @@ export class TaskEntity {
   @Column({ type: 'int', default: 0 })
   priority!: number;
 
+  @Column({ type: 'varchar', length: 36 })
+  ownerId!: string;
+
   @Column({ type: 'timestamptz', nullable: true })
   dueAt?: Nullable<Date>;
-
-  @Column({ type: 'int', nullable: true })
-  ownerId?: Nullable<number>;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
@@ -50,6 +50,7 @@ export class TaskEntity {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date;
 
+  // TODO: replace logging hooks with domain events or service-level logging
   @AfterInsert()
   logCreate() {
     console.log('Task created: ', this.id);

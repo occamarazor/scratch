@@ -16,7 +16,7 @@ export interface DatabaseConfig {
 }
 
 export interface AuthConfig {
-  jwtSecret: Nullable<string>; // TODO: allow bootstrapping without in early dev
+  jwtSecret: string;
   jwtExpiresIn: string;
 }
 

@@ -11,8 +11,8 @@ export class InitTasksTable1763138264842 implements MigrationInterface {
       "description" text,
       "status" varchar(11) NOT NULL DEFAULT 'TODO',
       "priority" integer NOT NULL DEFAULT 0,
+      "ownerId" varchar(36) NOT NULL,
       "dueAt" timestamptz,
-      "ownerId" integer,
       "createdAt" timestamptz NOT NULL DEFAULT now(),
       "updatedAt" timestamptz NOT NULL DEFAULT now()
       )`,

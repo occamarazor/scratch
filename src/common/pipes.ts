@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
 
 import type { Nullable } from './types';
 
+// TODO: remove if not needed; was added for parsing query params
 @Injectable()
 export class ParseNullableIntPipe implements PipeTransform<Nullable<string>, Nullable<number>> {
   transform(value: Nullable<string>): Nullable<number> {

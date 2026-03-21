@@ -17,7 +17,7 @@ import { TasksModule } from '@tasks/tasks.module';
       load: [configuration],
       validationSchema,
       cache: true,
-      envFilePath: ['.env.dev', '.env'],
+      envFilePath: ['.env', '.env.dev'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

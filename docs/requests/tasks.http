@@ -1,20 +1,25 @@
 ### Tasks API — REST client examples for Scratch (Task Tracker)
 # Set base URL (change if your app runs on a different host/port)
+
 @baseUrl = http://localhost:3000
 
-###
-# List all tasks
+# 🔐 Paste your generated JWT here
+@token1 = token1
+@token2 = token2
+# ❌ List user tasks (401, no token)
 GET {{baseUrl}}/api/tasks
 Accept: application/json
 
 ###
-# List tasks for ownerId=1
-GET {{baseUrl}}/api/tasks?ownerId=1
+# ✅ List user tasks (derived from token)
+GET {{baseUrl}}/api/tasks
+Authorization: Bearer {{token2}}
 Accept: application/json
 
 ###
-# Create a task (dueAt=null gets omitted)
+# ✅ Create task
 POST {{baseUrl}}/api/tasks
+Authorization: Bearer {{token1}}
 Content-Type: application/json
 
 {
@@ -25,17 +30,19 @@ Content-Type: application/json
 }
 
 ###
-# Create a task (title=undefined -> 400 validation errors)
+# ❌ Invalid create (missing title)
 POST {{baseUrl}}/api/tasks
+Authorization: Bearer {{token1}}
 Content-Type: application/json
 
 {
-  "description": "This request is invalid because title is missing"
+  "description": "Invalid payload"
 }
 
 ###
-# Bulk partial update (set status for multiple tasks)
+# ✅ Bulk update (only your tasks)
 PATCH {{baseUrl}}/api/tasks
+Authorization: Bearer {{token1}}
 Content-Type: application/json
 
 {
@@ -47,34 +54,34 @@ Content-Type: application/json
 }
 
 ###
-# Bulk partial update (400 validation errors)
+# ❌ Invalid bulk update
 PATCH {{baseUrl}}/api/tasks
+Authorization: Bearer {{token1}}
 Content-Type: application/json
 
 {
   "ids": [1, 2],
   "patch": {
-    "title": "",
-    "descript": "Mistyped prop",
     "status": "FAKE_STATUS",
-    "priority": 5,
-    "dueAt": ""
+    "priority": 999
   }
 }
 
 ###
-# Delete all tasks (CAUTION - DEV only)
+# ⚠️ Delete ALL your tasks
 DELETE {{baseUrl}}/api/tasks
-
+Authorization: Bearer {{token1}}
 
 ###
-# Get a single task (replace :id as needed)
+# ✅ Get single task (only if owned)
 GET {{baseUrl}}/api/tasks/1
+Authorization: Bearer {{token1}}
 Accept: application/json
 
 ###
-# Update a task (valid partial update)
+# ✅ Update single task
 PATCH {{baseUrl}}/api/tasks/1
+Authorization: Bearer {{token1}}
 Content-Type: application/json
 
 {
@@ -83,8 +90,9 @@ Content-Type: application/json
 }
 
 ###
-# Update a task (dueAt=null -> 400 validation error)
+# ❌ Invalid update (dueAt null)
 PATCH {{baseUrl}}/api/tasks/1
+Authorization: Bearer {{token1}}
 Content-Type: application/json
 
 {
@@ -92,5 +100,6 @@ Content-Type: application/json
 }
 
 ###
-# Delete a single task
+# ✅ Delete single task
 DELETE {{baseUrl}}/api/tasks/1
+Authorization: Bearer {{token1}}

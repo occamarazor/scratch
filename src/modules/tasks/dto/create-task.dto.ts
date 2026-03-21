@@ -19,7 +19,6 @@ export class CreateTaskDto {
   title!: string;
 
   @IsString()
-  @IsNotEmpty()
   @MaxLength(1000)
   @IsOptional()
   description?: string;

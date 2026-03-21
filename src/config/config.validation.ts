@@ -25,7 +25,7 @@ const baseSchema = Joi.object({
   DATABASE_USER: Joi.string().default(AppConfigDefaults.database.user),
   DATABASE_PASSWORD: Joi.string().default(AppConfigDefaults.database.password),
 
-  JWT_SECRET: Joi.string().allow('').optional(), // TODO: allow bootstrapping without in early dev
+  JWT_SECRET: Joi.string().min(32).required(),
   JWT_EXPIRES_IN: Joi.string().default(AppConfigDefaults.auth.jwtExpiresIn),
 });
 
