@@ -21,7 +21,7 @@ export class InitTasksTable1763138264842 implements MigrationInterface {
 
     // Add index (same columns, readable name)
     await queryRunner.query(`
-      CREATE INDEX "IDX_tasks_owner_status_priority" ON "tasks" ("tenantId", "ownerId", "status", "priority");
+      CREATE INDEX "IDX_tasks_tenant_owner_status_priority" ON "tasks" ("tenantId", "ownerId", "status", "priority");
     `);
 
     // Add DB-level priority range check
@@ -41,7 +41,7 @@ export class InitTasksTable1763138264842 implements MigrationInterface {
     // Drop constraints and index and table in reverse order
     await queryRunner.query(`ALTER TABLE "tasks" DROP CONSTRAINT "CHK_tasks_status_values"`);
     await queryRunner.query(`ALTER TABLE "tasks" DROP CONSTRAINT "CHK_tasks_priority_range"`);
-    await queryRunner.query(`DROP INDEX "IDX_tasks_owner_status_priority"`);
+    await queryRunner.query(`DROP INDEX "IDX_tasks_tenant_owner_status_priority"`);
     await queryRunner.query(`DROP TABLE "tasks"`);
   }
 }

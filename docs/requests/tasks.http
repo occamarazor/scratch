@@ -33,6 +33,12 @@ Content-Type: application/json
 }
 
 ###
+# ✅ Create task RAW
+POST {{baseUrl}}/api/tasks/raw
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+###
 # ❌ Invalid create
 POST {{baseUrl}}/api/tasks
 Authorization: Bearer {{token1}}

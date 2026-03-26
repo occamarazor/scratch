@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common/decorators';
 
+import { CreateTaskRawUseCase } from './application/create-task-raw.usecase';
 import { CreateTaskDto } from './dto/create-task.dto';
 import type { TaskResponseDto } from './dto/task-response.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -25,7 +26,10 @@ import type { Task, TasksUpdateResponse } from './tasks.types';
 @UseGuards(JwtAuthGuard)
 @Controller('/api/tasks')
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(
+    private readonly createTaskRawUseCase: CreateTaskRawUseCase,
+    private readonly tasksService: TasksService,
+  ) {}
 
   @Get()
   async getTasks(@CurrentUser() user: UserContext): Promise<TaskResponseDto[]> {
@@ -40,6 +44,11 @@ export class TasksController {
   ): Promise<TaskResponseDto> {
     const taskCreated: Task = await this.tasksService.createTask(dto, user);
     return this.tasksService.domainToResponse(taskCreated);
+  }
+
+  @Post('raw')
+  async createTaskRaw() {
+    return this.createTaskRawUseCase.execute();
   }
 
   @Patch()
