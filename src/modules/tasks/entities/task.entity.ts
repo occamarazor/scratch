@@ -14,6 +14,7 @@ import {
 
 import { TaskStatus } from '../tasks.types';
 
+// TODO: indexes
 @Entity('tasks')
 @Index(['tenantId', 'ownerId', 'status', 'priority'])
 @Check(`"priority" >= 0 AND "priority" <= 4`) // 0–4 range enforced

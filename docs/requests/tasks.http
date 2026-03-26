@@ -1,13 +1,13 @@
 ### Tasks API — REST client examples for Scratch (Task Tracker)
 # Set base URL (change if your app runs on a different host/port)
+# Generated a JWT token
+# JWT_SECRET=secret USER_ID=user-1 TENANT_ID=tenant-1 node scripts/auth.generate.js
 
 @baseUrl = http://localhost:3000
 
-# 🔐 Paste your generated JWT here
+# 🔐 TODO: remove generated JWT & update secret after tests
 @token1 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEiLCJ0ZW5hbnRJZCI6InRlbmFudC0xIiwiaWF0IjoxNzc0MTA4MzQzLCJleHAiOjE3NzY3MDAzNDN9.YxgS5OGx8Mb4gDg0SdQicBMRjXEwSt7YLaztpDS60l0
 @token2 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTIiLCJ0ZW5hbnRJZCI6InRlbmFudC0yIiwiaWF0IjoxNzc0MTA4MzY1LCJleHAiOjE3NzY3MDAzNjV9.SdK7y9eqKtFkr190Jokl5bK4c8DKO_M7AwFITbisT0U
-# @token1 = token1
-# @token2 = token2
 
 # ❌ List user tasks (401, no token)
 GET {{baseUrl}}/api/tasks
@@ -29,21 +29,27 @@ Content-Type: application/json
   "title": "Write project README",
   "description": "Draft README for Scratch app",
   "priority": 2,
-  "dueAt": null
+  "dueAt": "2025-11-01T12:00:00.000Z"
 }
 
 ###
-# ❌ Invalid create (missing title)
+# ❌ Invalid create
 POST {{baseUrl}}/api/tasks
 Authorization: Bearer {{token1}}
 Content-Type: application/json
 
 {
-  "description": "Invalid payload"
+  "description": "Invalid payload",
+  "status": "Invalid status",
+  "priority": 999,
+  "ownerId": "Fake owner",
+  "tenantId": "Fake tenant",
+  "dueAt": "Invalid date",
+  "createdAt": "2025-11-01T12:00:00.000Z"
 }
 
 ###
-# ✅ Bulk update (only your tasks)
+# ✅ Bulk update (current user tasks)
 PATCH {{baseUrl}}/api/tasks
 Authorization: Bearer {{token1}}
 Content-Type: application/json
@@ -71,12 +77,12 @@ Content-Type: application/json
 }
 
 ###
-# ⚠️ Delete ALL your tasks
+# ⚠️ Delete current user tasks
 DELETE {{baseUrl}}/api/tasks
 Authorization: Bearer {{token1}}
 
 ###
-# ✅ Get single task (only if owned)
+# ✅ Get single task (if owned)
 GET {{baseUrl}}/api/tasks/1
 Authorization: Bearer {{token1}}
 Accept: application/json

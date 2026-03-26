@@ -13,8 +13,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { UseGuards } from '@nestjs/common/decorators';
 
@@ -36,7 +34,6 @@ export class TasksController {
   }
 
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
   async createTask(
     @Body() dto: CreateTaskDto,
     @CurrentUser() user: UserContext,
@@ -71,7 +68,6 @@ export class TasksController {
   }
 
   @Patch(':id')
-  @UsePipes(new ValidationPipe({ transform: true }))
   async updateTaskById(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTaskDto,
