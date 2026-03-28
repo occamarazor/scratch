@@ -17,20 +17,22 @@ import {
 import { UseGuards } from '@nestjs/common/decorators';
 
 import { CreateTaskRawUseCase } from './application/create-task-raw.usecase';
+import { UpdateTaskOrderUseCase } from './application/update-task-order.usecase';
 import { CreateTaskDto } from './dto/create-task.dto';
 import type { TaskResponseDto } from './dto/task-response.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 import type { Task, TasksUpdateResponse } from './tasks.types';
 
-@UseGuards(JwtAuthGuard)
 @Controller('/api/tasks')
 export class TasksController {
   constructor(
     private readonly createTaskRawUseCase: CreateTaskRawUseCase,
+    private readonly updateTaskOrderUseCase: UpdateTaskOrderUseCase,
     private readonly tasksService: TasksService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getTasks(@CurrentUser() user: UserContext): Promise<TaskResponseDto[]> {
     const tasksList: Task[] = await this.tasksService.getTasks(user);
@@ -43,15 +45,6 @@ export class TasksController {
     @CurrentUser() user: UserContext,
   ): Promise<TaskResponseDto> {
     const taskCreated: Task = await this.tasksService.createTask(dto, user);
-    return this.tasksService.domainToResponse(taskCreated);
-  }
-
-  @Post('raw')
-  async createTaskRaw(
-    @Body() dto: CreateTaskDto,
-    @CurrentUser() user: UserContext,
-  ): Promise<TaskResponseDto> {
-    const taskCreated: Task = await this.createTaskRawUseCase.execute(dto, user);
     return this.tasksService.domainToResponse(taskCreated);
   }
 
@@ -100,5 +93,24 @@ export class TasksController {
     const deletionResult: boolean = await this.tasksService.deleteTaskById(id, user);
     if (!deletionResult) throw new NotFoundException(`Task with ID: ${id} not found`);
     return;
+  }
+
+  // EXPERIMENTAL ROUTES
+
+  // Explicit Transaction (RAW SQL) with failure simulation
+  @Post('raw')
+  async createTaskRaw(
+    @Body() dto: CreateTaskDto,
+    @CurrentUser() user: UserContext,
+  ): Promise<TaskResponseDto> {
+    const taskCreated: Task = await this.createTaskRawUseCase.execute(dto, user);
+    return this.tasksService.domainToResponse(taskCreated);
+  }
+
+  // Deadlock simulation (2 concurrent test requests nesecessary)
+  @Post('deadlock')
+  async updateTaskOrder(@Body() body: { firstId: number; secondId: number }) {
+    await this.updateTaskOrderUseCase.execute(body.firstId, body.secondId);
+    return { ok: true };
   }
 }

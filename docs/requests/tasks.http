@@ -1,4 +1,4 @@
-### Tasks API — REST client examples for Scratch (Task Tracker)
+# Tasks API — REST client examples for Scratch (Task Tracker)
 # Set base URL (change if your app runs on a different host/port)
 # Generated a JWT token
 # JWT_SECRET=secret USER_ID=user-1 TENANT_ID=tenant-1 node scripts/auth.generate.js
@@ -28,19 +28,6 @@ Content-Type: application/json
 {
   "title": "Write project README",
   "description": "Draft README for Scratch app",
-  "priority": 2,
-  "dueAt": "2025-11-01T12:00:00.000Z"
-}
-
-###
-# ✅ Create task RAW
-POST {{baseUrl}}/api/tasks/raw
-Authorization: Bearer {{token1}}
-Content-Type: application/json
-
-{
-  "title": "Raw task title",
-  "description": "Raw task description",
   "priority": 2,
   "dueAt": "2025-11-01T12:00:00.000Z"
 }
@@ -125,3 +112,41 @@ Content-Type: application/json
 # ✅ Delete single task
 DELETE {{baseUrl}}/api/tasks/1
 Authorization: Bearer {{token1}}
+
+
+# Experimental endpoints
+
+###
+# ✅ Create task RAW
+POST {{baseUrl}}/api/tasks/raw
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "title": "Raw task title",
+  "description": "Raw task description",
+  "priority": 2,
+  "dueAt": "2025-11-01T12:00:00.000Z"
+}
+
+###
+# ❌ Deadlock simulation PART 1
+POST {{baseUrl}}/api/tasks/deadlock
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "firstId": 1,
+  "secondId": 2
+}
+
+###
+# ❌ Deadlock simulation PART 2
+POST {{baseUrl}}/api/tasks/deadlock
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "firstId": 2,
+  "secondId": 1
+}
