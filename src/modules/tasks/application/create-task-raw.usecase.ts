@@ -1,28 +1,28 @@
+import { UserContext } from '@common/types';
 import { Injectable } from '@nestjs/common';
+import { CreateTaskDto } from '@tasks/dto/create-task.dto';
+import { TasksService } from '@tasks/tasks.service';
 import { Task } from '@tasks/tasks.types';
 import { DataSource, QueryRunner } from 'typeorm';
 
 @Injectable()
 export class CreateTaskRawUseCase {
-  constructor(private readonly dataSource: DataSource) {}
+  constructor(
+    private readonly dataSource: DataSource,
+    private readonly tasksService: TasksService,
+  ) {}
 
-  async execute() {
+  async execute(dto: CreateTaskDto, user: UserContext): Promise<Task> {
     const qr: QueryRunner = this.dataSource.createQueryRunner();
 
     await qr.connect();
     await qr.startTransaction();
 
     try {
-      const tasks = (await qr.query(`
-        INSERT INTO tasks (title, "tenantId", "ownerId")
-        VALUES ('TX Task', 'tenant-1', 'user-1')
-        RETURNING *;
-      `)) as Task[];
+      const task: Task = await this.tasksService.insertTaskRaw(qr, dto, user);
 
-      // TODO: simulate transaction failure
-      throw new Error('Fail mid-transaction');
-
-      const task: Task = tasks[0];
+      // Failure simulation (toggle)
+      // throw new Error('Fail mid-transaction');
 
       await qr.commitTransaction();
 

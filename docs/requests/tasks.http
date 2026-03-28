@@ -38,6 +38,13 @@ POST {{baseUrl}}/api/tasks/raw
 Authorization: Bearer {{token1}}
 Content-Type: application/json
 
+{
+  "title": "Raw task title",
+  "description": "Raw task description",
+  "priority": 2,
+  "dueAt": "2025-11-01T12:00:00.000Z"
+}
+
 ###
 # ❌ Invalid create
 POST {{baseUrl}}/api/tasks

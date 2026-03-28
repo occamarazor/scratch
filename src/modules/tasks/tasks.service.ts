@@ -3,19 +3,38 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject, ValidationError } from 'class-validator';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, QueryRunner, Repository, UpdateResult } from 'typeorm';
 
 import type { CreateTaskDto } from './dto/create-task.dto';
 import type { TaskResponseDto } from './dto/task-response.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskEntity } from './entities/task.entity';
 import type { Task } from './tasks.types';
+
+// TODO: make service thin & reusable
+//  TODO: move entity & service to domain dir
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(TaskEntity)
     private readonly tasksRepository: Repository<TaskEntity>,
   ) {}
+
+  // Maps raw DB row to business logic model Task
+  private dbRowToDomain(row: Task): Task {
+    return {
+      id: row.id,
+      title: row.title,
+      description: row.description ?? undefined,
+      status: row.status,
+      priority: row.priority,
+      tenantId: row.tenantId,
+      ownerId: row.ownerId,
+      dueAt: row.dueAt ? new Date(row.dueAt) : undefined,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+    };
+  }
 
   // Maps persistence model TaskEntity to business logic model Task
   private entityToDomain(e: TaskEntity): Task {
@@ -72,6 +91,27 @@ export class TasksService {
     const taskEntitySaved: TaskEntity = await this.tasksRepository.save(taskEntityCreated);
 
     return this.entityToDomain(taskEntitySaved);
+  }
+
+  async insertTaskRaw(qr: QueryRunner, dto: CreateTaskDto, user: UserContext): Promise<Task> {
+    const taskRows = (await qr.query(
+      `
+      INSERT INTO tasks (title, description, status, priority, "tenantId", "ownerId", "dueAt")
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *;
+      `,
+      [
+        dto.title,
+        dto.description ?? undefined,
+        dto.status ?? 'TODO',
+        dto.priority ?? 0,
+        user.tenantId,
+        user.userId,
+        dto.dueAt ?? undefined,
+      ],
+    )) as Task[];
+
+    return this.dbRowToDomain(taskRows[0]);
   }
 
   async updateTasks(

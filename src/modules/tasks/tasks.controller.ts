@@ -47,8 +47,12 @@ export class TasksController {
   }
 
   @Post('raw')
-  async createTaskRaw() {
-    return this.createTaskRawUseCase.execute();
+  async createTaskRaw(
+    @Body() dto: CreateTaskDto,
+    @CurrentUser() user: UserContext,
+  ): Promise<TaskResponseDto> {
+    const taskCreated: Task = await this.createTaskRawUseCase.execute(dto, user);
+    return this.tasksService.domainToResponse(taskCreated);
   }
 
   @Patch()
