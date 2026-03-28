@@ -24,6 +24,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
 import type { Task, TasksUpdateResponse } from './tasks.types';
 
+@UseGuards(JwtAuthGuard)
 @Controller('/api/tasks')
 export class TasksController {
   constructor(
@@ -32,7 +33,6 @@ export class TasksController {
     private readonly tasksService: TasksService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   async getTasks(@CurrentUser() user: UserContext): Promise<TaskResponseDto[]> {
     const tasksList: Task[] = await this.tasksService.getTasks(user);
