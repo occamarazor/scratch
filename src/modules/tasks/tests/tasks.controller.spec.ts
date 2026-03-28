@@ -1,6 +1,7 @@
 import { UserContext } from '@common/types';
 import { NotFoundException } from '@nestjs/common';
 import { CreateTaskRawUseCase } from '@tasks/application/create-task-raw.usecase';
+import { UpdateTaskOrderUseCase } from '@tasks/application/update-task-order.usecase';
 import type { CreateTaskDto } from '@tasks/dto/create-task.dto';
 import type { TaskResponseDto } from '@tasks/dto/task-response.dto';
 import type { UpdateTaskDto } from '@tasks/dto/update-task.dto';
@@ -15,14 +16,16 @@ import {
   generateTasksDomainToResponse,
   generateUpdateTaskDto,
   resetFactories,
+  UpdateTaskOrderUseCaseMock,
 } from '@tasks/tests/tasks.factories';
 import { generateServiceMock } from '@test/utils/factories';
 import type { ServiceMock } from '@test/utils/types';
 
 describe('TasksController', () => {
   let controller: TasksController;
-  let serviceMock: ServiceMock<TasksService>;
   let createTaskRawUseCaseMock: CreateTaskRawUseCaseMock;
+  let updateTaskOrderUseCaseMock: UpdateTaskOrderUseCaseMock;
+  let serviceMock: ServiceMock<TasksService>;
 
   beforeEach(() => {
     resetFactories();
@@ -45,9 +48,14 @@ describe('TasksController', () => {
       execute: jest.fn(),
     };
 
+    updateTaskOrderUseCaseMock = {
+      execute: jest.fn(),
+    };
+
     // Deliberate double cast for tests: concrete TasksService expected
     controller = new TasksController(
       createTaskRawUseCaseMock as unknown as CreateTaskRawUseCase,
+      updateTaskOrderUseCaseMock as unknown as UpdateTaskOrderUseCase,
       serviceMock as unknown as TasksService,
     );
   });

@@ -82,3 +82,7 @@ export const generateTasksDomainToResponse = (): jest.Mock =>
 export interface CreateTaskRawUseCaseMock {
   execute: jest.Mock;
 }
+
+export interface UpdateTaskOrderUseCaseMock {
+  execute: jest.Mock;
+}

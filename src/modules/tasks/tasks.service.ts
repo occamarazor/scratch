@@ -93,27 +93,6 @@ export class TasksService {
     return this.entityToDomain(taskEntitySaved);
   }
 
-  async insertTaskRaw(qr: QueryRunner, dto: CreateTaskDto, user: UserContext): Promise<Task> {
-    const taskRows = (await qr.query(
-      `
-      INSERT INTO tasks (title, description, status, priority, "tenantId", "ownerId", "dueAt")
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *;
-      `,
-      [
-        dto.title,
-        dto.description ?? undefined,
-        dto.status ?? 'TODO',
-        dto.priority ?? 0,
-        user.tenantId,
-        user.userId,
-        dto.dueAt ?? undefined,
-      ],
-    )) as Task[];
-
-    return this.dbRowToDomain(taskRows[0]);
-  }
-
   async updateTasks(
     ids: number[],
     patch: Partial<UpdateTaskDto>,
@@ -223,5 +202,29 @@ export class TasksService {
     });
 
     return (deletionResult.affected ?? 0) === 1;
+  }
+
+  // EXPERIMENTAL METHODS
+
+  // Explicit Transaction (RAW SQL) with failure simulation
+  async insertTaskRaw(qr: QueryRunner, dto: CreateTaskDto, user: UserContext): Promise<Task> {
+    const taskRows = (await qr.query(
+      `
+      INSERT INTO tasks (title, description, status, priority, "tenantId", "ownerId", "dueAt")
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *;
+      `,
+      [
+        dto.title,
+        dto.description ?? undefined,
+        dto.status ?? 'TODO',
+        dto.priority ?? 0,
+        user.tenantId,
+        user.userId,
+        dto.dueAt ?? undefined,
+      ],
+    )) as Task[];
+
+    return this.dbRowToDomain(taskRows[0]);
   }
 }
