@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { DataSource, QueryRunner } from 'typeorm';
 
 @Injectable()
@@ -26,8 +26,16 @@ export class UpdateTaskOrderUseCase {
       console.log(`Locked second row, ID: ${secondId}`);
 
       await qr.commitTransaction();
-    } catch (e) {
+    } catch (e: unknown) {
       await qr.rollbackTransaction();
+
+      if (e && typeof e === 'object' && 'code' in e) {
+        if (e.code === '40P01') {
+          // PostgreSQL deadlock
+          throw new ConflictException('Deadlock detected, retry');
+        }
+      }
+
       throw e;
     } finally {
       await qr.release();

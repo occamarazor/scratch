@@ -1,8 +1,10 @@
 # Scratch
 
-Scratch is a backend-first task management API built to demonstrate production-grade backend architecture, data modeling, and developer experience rather than feature breadth.
+Scratch is a backend-first task management API built to demonstrate production-grade backend
+architecture, data modeling, and developer experience rather than feature breadth.
 
-This repository is intentionally architecture-centric. Decisions are explicit, documented, and optimized for long-term SaaS evolution.
+This repository is intentionally architecture-centric. Decisions are explicit, documented, and
+optimized for long-term SaaS evolution.
 
 ## Purpose
 
@@ -14,6 +16,7 @@ This repository is intentionally architecture-centric. Decisions are explicit, d
 ## Scope (Phase 1)
 
 ### In scope
+
 - Tasks CRUD API
 - DTO validation and error handling
 - PostgreSQL + TypeORM
@@ -21,12 +24,14 @@ This repository is intentionally architecture-centric. Decisions are explicit, d
 - Test foundations
 
 ### Out of scope (for MVP enforcement)
+
 - End-user UI
 - Billing or quotas
 - Distributed microservices
 - Production-grade observability stacks
 
-Note: Infrastructure, queues, caching, and observability are introduced **progressively and demonstratively** to support architectural learning.
+Note: Infrastructure, queues, caching, and observability are introduced **progressively and
+demonstratively** to support architectural learning.
 
 ## Project Structure
 
@@ -63,13 +68,16 @@ Note: Infrastructure, queues, caching, and observability are introduced **progre
 ```
 
 ## Requirements
+
 - Node.js >= 22
 - pnpm >= 10
 - Docker & Docker Compose
 - PostgreSQL 16 (via Docker)
 
 ## Environment
-Environment variables are defined in .env.dev (committed, used by default). Local overrides can be placed in .env.
+
+Environment variables are defined in .env.dev (committed, used by default). Local overrides can be
+placed in .env.
 
 ```
 APP_NAME=Scratch
@@ -93,6 +101,7 @@ JWT_EXPIRES_IN=1h
 pnpm install
 pnpm docker:up
 pnpm migrate:run
+pnpm seed:tasks
 pnpm start:dev
 ```
 
@@ -100,22 +109,24 @@ API will be available at http://localhost:3000.
 
 ## Endpoints
 
-| **Method** | **Endpoint**     | **Description**                     |
-| ---------- | ---------------- | ----------------------------------- |
-| GET        | `/api/tasks`     | List tasks                          |
-| POST       | `/api/tasks`     | Create task                         |
-| PATCH      | `/api/tasks`     | Bulk update tasks                   |
-| DELETE     | `/api/tasks`     | Delete all tasks                    |
-| GET        | `/api/tasks/:id` | Get task by id                      |
-| PATCH      | `/api/tasks/:id` | Update task                         |
-| DELETE     | `/api/tasks/:id` | Delete task                         |
+| **Method** | **Endpoint**     | **Description**   |
+| ---------- | ---------------- | ----------------- |
+| GET        | `/api/tasks`     | List tasks        |
+| POST       | `/api/tasks`     | Create task       |
+| PATCH      | `/api/tasks`     | Bulk update tasks |
+| DELETE     | `/api/tasks`     | Delete all tasks  |
+| GET        | `/api/tasks/:id` | Get task by id    |
+| PATCH      | `/api/tasks/:id` | Update task       |
+| DELETE     | `/api/tasks/:id` | Delete task       |
 
 ## Documentation
+
 - docs/roadmap/roadmap.md — phased product evolution plan
 - docs/architecture/architecture.md — core system design and trade-offs
-- docs/architecture/diagrams/*.png — visual architecture diagrams
-- docs/architecture/diagrams/*.mmd — architecture diagrams code
-- scratch-technical-future.mmd represents a **defensible evolution path**, not an immediately implemented system
-- docs/architecture/adr/*.md — architectural decision records
-- docs/requests/*.http — example API calls
+- docs/architecture/diagrams/\*.png — visual architecture diagrams
+- docs/architecture/diagrams/\*.mmd — architecture diagrams code
+- scratch-technical-future.mmd represents a **defensible evolution path**, not an immediately
+  implemented system
+- docs/architecture/adr/\*.md — architectural decision records
+- docs/requests/\*.http — example API calls
 - docs/scripts.md — complete pnpm scripts reference
