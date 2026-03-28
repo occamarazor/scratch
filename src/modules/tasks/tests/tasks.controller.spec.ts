@@ -1,5 +1,6 @@
 import { UserContext } from '@common/types';
 import { NotFoundException } from '@nestjs/common';
+import { CreateTaskRawUseCase } from '@tasks/application/create-task-raw.usecase';
 import type { CreateTaskDto } from '@tasks/dto/create-task.dto';
 import type { TaskResponseDto } from '@tasks/dto/task-response.dto';
 import type { UpdateTaskDto } from '@tasks/dto/update-task.dto';
@@ -8,6 +9,7 @@ import type { TasksService } from '@tasks/tasks.service';
 import type { Task, TasksUpdateResponse } from '@tasks/tasks.types';
 import { TaskStatus } from '@tasks/tasks.types';
 import {
+  CreateTaskRawUseCaseMock,
   generateCreateTaskDto,
   generateTask,
   generateTasksDomainToResponse,
@@ -20,6 +22,7 @@ import type { ServiceMock } from '@test/utils/types';
 describe('TasksController', () => {
   let controller: TasksController;
   let serviceMock: ServiceMock<TasksService>;
+  let createTaskRawUseCaseMock: CreateTaskRawUseCaseMock;
 
   beforeEach(() => {
     resetFactories();
@@ -38,8 +41,15 @@ describe('TasksController', () => {
       generateTasksDomainToResponse,
     );
 
+    createTaskRawUseCaseMock = {
+      execute: jest.fn(),
+    };
+
     // Deliberate double cast for tests: concrete TasksService expected
-    controller = new TasksController(serviceMock as unknown as TasksService);
+    controller = new TasksController(
+      createTaskRawUseCaseMock as unknown as CreateTaskRawUseCase,
+      serviceMock as unknown as TasksService,
+    );
   });
 
   afterEach(() => {
@@ -106,6 +116,25 @@ describe('TasksController', () => {
     const result: TaskResponseDto = await controller.createTask(dto, user);
     expect(serviceMock.createTask).toHaveBeenCalledWith(dto, user);
     expect(result.ownerId).toBe(ownerId);
+  });
+
+  it('createTaskRaw: should call use case and map response', async () => {
+    const tenantId: string = 'tenant-xyz';
+    const ownerId: string = 'user-321';
+    const user: UserContext = { userId: ownerId, tenantId };
+
+    const dto: CreateTaskDto = generateCreateTaskDto();
+    const created: Task = generateTask({ title: dto.title, tenantId, ownerId });
+
+    createTaskRawUseCaseMock.execute.mockResolvedValue(created);
+
+    const result: TaskResponseDto = await controller.createTaskRaw(dto, user);
+
+    expect(createTaskRawUseCaseMock.execute).toHaveBeenCalledWith(dto, user);
+    expect(serviceMock.domainToResponse).toHaveBeenCalledWith(created);
+    expect(result.tenantId).toBe(tenantId);
+    expect(result.ownerId).toBe(ownerId);
+    expect(result.title).toBe(dto.title);
   });
 
   it('updateTasks: should return affected count on success', async () => {

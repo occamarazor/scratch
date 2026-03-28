@@ -78,3 +78,7 @@ export const generateTasksDomainToResponse = (): jest.Mock =>
     createdAt: task.createdAt.toISOString(),
     updatedAt: task.updatedAt.toISOString(),
   }));
+
+export interface CreateTaskRawUseCaseMock {
+  execute: jest.Mock;
+}
