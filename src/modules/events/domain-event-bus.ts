@@ -13,6 +13,13 @@ export class DomainEventBus {
   constructor(@InjectQueue('tasks') private readonly queue: Queue) {}
 
   async publish<T>(event: DomainEvent<T>) {
-    await this.queue.add(event.name, event.payload);
+    // Controlled retry
+    await this.queue.add(event.name, event.payload, {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 1000,
+      },
+    });
   }
 }
