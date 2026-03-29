@@ -25,6 +25,8 @@
     "paths": {
       "@config/*": ["src/config/*"],
       "@common/*": ["src/common/*"],
+      "@events/*": ["src/modules/events/*"],
+      "@jobs/*": ["src/modules/jobs/*"],
       "@auth/*": ["src/modules/auth/*"],
       "@tasks/*": ["src/modules/tasks/*"],
       "@test/*": ["test/*"]

@@ -1,4 +1,5 @@
 import { UserContext } from '@common/types';
+import { DomainEventBus } from '@events/domain-event-bus';
 import { Injectable } from '@nestjs/common';
 import { CreateTaskDto } from '@tasks/dto/create-task.dto';
 import { TasksService } from '@tasks/tasks.service';
@@ -10,6 +11,7 @@ export class CreateTaskRawUseCase {
   constructor(
     private readonly dataSource: DataSource,
     private readonly tasksService: TasksService,
+    private readonly eventBus: DomainEventBus,
   ) {}
 
   async execute(dto: CreateTaskDto, user: UserContext): Promise<Task> {
@@ -25,6 +27,16 @@ export class CreateTaskRawUseCase {
       // throw new Error('Fail mid-transaction');
 
       await qr.commitTransaction();
+
+      // TODO: what if event fails? Fix via outbox pattern
+      await this.eventBus.publish({
+        name: 'task.created',
+        payload: {
+          taskId: task.id,
+          userId: user.userId,
+          tenantId: user.tenantId,
+        },
+      });
 
       return task;
     } catch (e) {

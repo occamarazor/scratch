@@ -5,6 +5,7 @@ import configuration from '@config/config.factory';
 import type { AppConfig, DatabaseConfig } from '@config/config.types';
 import { NodeEnv } from '@config/config.types';
 import validationSchema from '@config/config.validation';
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
@@ -47,6 +48,12 @@ import { TasksModule } from '@tasks/tasks.module';
               ? ['error'] // minimal logging in CI
               : ['error'],
         } as TypeOrmModuleOptions;
+      },
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
       },
     }),
     AuthModule,
