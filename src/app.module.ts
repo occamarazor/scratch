@@ -50,6 +50,7 @@ import { TasksModule } from '@tasks/tasks.module';
         } as TypeOrmModuleOptions;
       },
     }),
+    // TODO: use env vars and nest config
     BullModule.forRoot({
       connection: {
         host: 'localhost',

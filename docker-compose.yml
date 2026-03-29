@@ -1,3 +1,4 @@
+# TODO: use env vars and .env file for configuration
 version: '3.9'
 
 services:

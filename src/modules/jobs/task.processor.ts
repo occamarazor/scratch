@@ -34,7 +34,8 @@ export class TaskProcessor extends WorkerHost {
       // }
 
       // Service failure simulation (toggle)
-      throw new Error('External service failure');
+      // throw new Error('External service failure');
+
       return;
     }
 
