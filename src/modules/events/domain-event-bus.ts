@@ -20,6 +20,7 @@ export class DomainEventBus {
         type: 'exponential',
         delay: 1000,
       },
+      removeOnFail: false,
     });
   }
 }
