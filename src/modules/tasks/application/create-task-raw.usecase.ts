@@ -38,15 +38,27 @@ export class CreateTaskRawUseCase {
         },
       });
 
-      // Duplicate execution simulation (toggle)
-      await this.eventBus.publish({
-        name: 'task.created',
-        payload: {
-          taskId: task.id,
-          userId: user.userId,
-          tenantId: user.tenantId,
-        },
-      });
+      // Duplicate event execution simulation (toggle)
+      // await this.eventBus.publish({
+      //   name: 'task.created',
+      //   payload: {
+      //     taskId: task.id,
+      //     userId: user.userId,
+      //     tenantId: user.tenantId,
+      //   },
+      // });
+
+      // Event flood simulation (toggle)
+      for (let i = 0; i < 50; i++) {
+        await this.eventBus.publish({
+          name: 'task.created',
+          payload: {
+            taskId: task.id,
+            userId: user.userId,
+            tenantId: user.tenantId,
+          },
+        });
+      }
 
       return task;
     } catch (e) {
