@@ -28,8 +28,13 @@ export class TaskProcessor extends WorkerHost {
       console.log(`Received task: '${job.name}'...`);
       console.log('Received payload: ', job.data);
 
-      // Failure simulation (toggle)
-      throw new Error('External service failed');
+      // Random failure simulation (toggle)
+      if (Math.random() < 0.7) {
+        throw new Error('Random failure');
+      }
+
+      // Service failure simulation (toggle)
+      // throw new Error('External service failure');
       // return;
     }
 
