@@ -38,6 +38,16 @@ export class CreateTaskRawUseCase {
         },
       });
 
+      // Duplicate execution simulation (toggle)
+      await this.eventBus.publish({
+        name: 'task.created',
+        payload: {
+          taskId: task.id,
+          userId: user.userId,
+          tenantId: user.tenantId,
+        },
+      });
+
       return task;
     } catch (e) {
       await qr.rollbackTransaction();

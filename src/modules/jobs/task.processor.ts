@@ -29,13 +29,13 @@ export class TaskProcessor extends WorkerHost {
       console.log('Received payload: ', job.data);
 
       // Random failure simulation (toggle)
-      if (Math.random() < 0.7) {
-        throw new Error('Random failure');
-      }
+      // if (Math.random() < 0.7) {
+      //   throw new Error('Random failure');
+      // }
 
       // Service failure simulation (toggle)
       // throw new Error('External service failure');
-      // return;
+      return;
     }
 
     console.warn('Unknown job: ', job.name);
