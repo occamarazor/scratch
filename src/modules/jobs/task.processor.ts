@@ -1,5 +1,6 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
+import { DataSource } from 'typeorm';
 
 // TODO: move types
 export interface TaskCreatedPayload {
@@ -14,6 +15,10 @@ export type TaskJob =
 
 @Processor('tasks')
 export class TaskProcessor extends WorkerHost {
+  constructor(private readonly dataSource: DataSource) {
+    super();
+  }
+
   // NestJS/BullMQ doesn't print worker stack traces to console by default
   @OnWorkerEvent('failed')
   onFailed(job: TaskJob, error: Error) {
@@ -21,24 +26,44 @@ export class TaskProcessor extends WorkerHost {
   }
 
   async process(job: TaskJob): Promise<void> {
-    // TODO: dummy await
-    await Promise.resolve();
+    if (job.name !== 'task.created') return;
 
-    if (job.name === 'task.created') {
-      console.log(`Received task: '${job.name}'...`);
-      console.log('Received payload: ', job.data);
+    const divider = '-----------------------------------';
+    const taskId = (job.data as TaskCreatedPayload).taskId;
+    const key = `task.created:${taskId}`;
 
-      // Random failure simulation (toggle)
-      // if (Math.random() < 0.7) {
-      //   throw new Error('Random failure');
-      // }
+    console.log(divider);
+    console.log(`Processing job ${job.id} with key ${key}...`);
 
-      // Service failure simulation (toggle)
-      // throw new Error('External service failure');
+    // SIMULATION: Dummy await for any failure simulation
+    // await Promise.resolve();
+
+    // SIMULATION: Service failure (toggle)
+    // throw new Error('External service failure');
+
+    // SIMULATION: Random failure BEFORE insert (toggle)
+    if (Math.random() < 0.5) {
+      throw new Error('Random failure');
+    }
+
+    try {
+      await this.dataSource.query(`INSERT INTO processed_jobs (job_key) VALUES ($1)`, [key]);
+    } catch (e: unknown) {
+      // Duplicate → already processed
+      console.warn(`Error: ${(e as Error).message}`);
+      console.log(`Duplicate job ${job.id} with key ${key} skipped`);
+      console.log(divider);
 
       return;
     }
 
-    console.warn('Unknown job: ', job.name);
+    // SIMULATION: Random failure AFTER insert (toggle)
+    // if (Math.random() < 0.5) {
+    //   throw new Error('Random failure');
+    // }
+
+    // Real processing (only once)
+    console.log(`PROCESSED job ${job.id} with key ${key}`);
+    console.log(divider);
   }
 }

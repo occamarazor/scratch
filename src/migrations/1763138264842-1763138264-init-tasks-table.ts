@@ -4,18 +4,28 @@ export class InitTasksTable1763138264842 implements MigrationInterface {
   name = 'InitTasksTable1763138264842';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // TODO move processed_jobs table to its own migration
+    // Create processed_jobs idempotency table
+    await queryRunner.query(
+      `CREATE TABLE "processed_jobs" (
+        "job_key" TEXT PRIMARY KEY,
+        "created_at" TIMESTAMP DEFAULT now()
+      );`,
+    );
+
+    // Create tasks table
     await queryRunner.query(
       `CREATE TABLE "tasks" (
-      "id" SERIAL PRIMARY KEY,
-      "title" varchar(255) NOT NULL,
-      "description" text,
-      "status" varchar(11) NOT NULL DEFAULT 'TODO',
-      "priority" integer NOT NULL DEFAULT 0,
-      "tenantId" varchar(36) NOT NULL,
-      "ownerId" varchar(36) NOT NULL,
-      "dueAt" timestamptz,
-      "createdAt" timestamptz NOT NULL DEFAULT now(),
-      "updatedAt" timestamptz NOT NULL DEFAULT now()
+        "id" SERIAL PRIMARY KEY,
+        "title" varchar(255) NOT NULL,
+        "description" text,
+        "status" varchar(11) NOT NULL DEFAULT 'TODO',
+        "priority" integer NOT NULL DEFAULT 0,
+        "tenantId" varchar(36) NOT NULL,
+        "ownerId" varchar(36) NOT NULL,
+        "dueAt" timestamptz,
+        "createdAt" timestamptz NOT NULL DEFAULT now(),
+        "updatedAt" timestamptz NOT NULL DEFAULT now()
       )`,
     );
 
@@ -43,5 +53,6 @@ export class InitTasksTable1763138264842 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE "tasks" DROP CONSTRAINT "CHK_tasks_priority_range"`);
     await queryRunner.query(`DROP INDEX "IDX_tasks_tenant_owner_status_priority"`);
     await queryRunner.query(`DROP TABLE "tasks"`);
+    await queryRunner.query(`DROP TABLE "processed_jobs"`);
   }
 }

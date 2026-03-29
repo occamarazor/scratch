@@ -23,7 +23,7 @@ export class CreateTaskRawUseCase {
     try {
       const task: Task = await this.tasksService.insertTaskRaw(qr, dto, user);
 
-      // Failure simulation (toggle)
+      // SIMULATION: Mid-transaction failure (toggle)
       // throw new Error('Fail mid-transaction');
 
       await qr.commitTransaction();
@@ -38,17 +38,17 @@ export class CreateTaskRawUseCase {
         },
       });
 
-      // Duplicate event execution simulation (toggle)
-      // await this.eventBus.publish({
-      //   name: 'task.created',
-      //   payload: {
-      //     taskId: task.id,
-      //     userId: user.userId,
-      //     tenantId: user.tenantId,
-      //   },
-      // });
+      // SIMULATION: Duplicate event execution (toggle)
+      await this.eventBus.publish({
+        name: 'task.created',
+        payload: {
+          taskId: task.id,
+          userId: user.userId,
+          tenantId: user.tenantId,
+        },
+      });
 
-      // Event flood simulation (toggle)
+      // SIMULATION: Event flood (toggle + trigger Service failure simulation in TaskProcessor)
       // for (let i = 0; i < 50; i++) {
       //   await this.eventBus.publish({
       //     name: 'task.created',
